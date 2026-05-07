@@ -172,72 +172,100 @@ const manejarEnvio = async (e: React.FormEvent<HTMLFormElement>) => {
         </div>
       </section>
 
-      {/* --- SECCIÓN SERVICIOS (Minimalista y Elegante) --- */}
-      <section id="servicios" className="py-24 bg-white">
+      {/* --- SECCIÓN NUESTROS SERVICIOS (DISEÑO WIREFRAME/LÍNEAS - TODO BLANCO) --- */}
+      <section id="servicios" className="py-20 bg-white"> {/* Fondo blanco puro y py ajustado */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          {/* Título de la sección */}
-          <div className="text-center mb-20">
-            <h2 className="text-3xl font-light text-gray-900 tracking-tight mb-6">
+          {/* Cabecera de Sección: Estilo Moderno con Gradiente y Etiqueta */}
+          <div className="text-center mb-16 relative flex flex-col items-center"> 
+            
+            {/* 1. Etiqueta / Badge superior */}
+            <span className="inline-block py-1 px-3 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-xs font-bold tracking-widest uppercase mb-4">
+              Soluciones Integrales
+            </span>
+
+            {/* 2. Título principal con efecto de gradiente */}
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-800 to-slate-900 pb-2">
               Nuestros servicios
             </h2>
-            <div className="w-12 h-px bg-gray-300 mx-auto"></div>
-          </div>
-
-          {/* Grilla de Tarjetas - Diseño Minimalista */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             
-            {/* Tarjeta 1 */}
-            <a href="#detalle-mantenimiento" className="group block p-8 rounded-2xl bg-gray-50/50 hover:bg-white border border-transparent hover:border-gray-100 hover:shadow-2xl hover:shadow-gray-200/40 transition-all duration-500">
-              <div className="mb-8 text-gray-400 group-hover:text-blue-600 transition-colors duration-500">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          {/* Grilla de Tarjetas: 4 columnas en desktop */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            
+            {/* Tarjeta 1: Mantenimiento (Wireframe Style) */}
+            {/* Todo el detalle está en el border-slate-100 y el sutil shadow-sm inicial */}
+            <div className="group bg-white p-8 rounded-2xl border border-slate-100 shadow-sm transition-all duration-300 hover:shadow-lg hover:border-slate-200 hover:-translate-y-1">
+              {/* Contenedor de Icono Geométrico (Siempre Azul) */}
+              <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mb-8">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path>
+                </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">Mantenimiento y reparación</h3>
-              <p className="text-sm text-gray-500 leading-relaxed mb-6 font-light">Reparación, mantenimiento preventivo y limpieza profunda de pc y notebooks.</p>
-              <div className="flex items-center text-sm font-medium text-gray-400 group-hover:text-blue-600 transition-colors">
-                <span>Saber más</span>
-                <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-              </div>
-            </a>
+              <h3 className="text-xl font-bold text-slate-900 mb-4">
+                Mantenimiento y reparación
+              </h3>
+              <p className="text-slate-600 leading-relaxed mb-6 text-sm">
+                Reparación, mantenimiento preventivo y limpieza profunda de PC y notebooks.
+              </p>
+              <a href="#contacto" className="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors flex items-center gap-1 group-hover:text-blue-600">
+                Saber más <span className="transition-transform group-hover:translate-x-1">→</span>
+              </a>
+            </div>
 
-            {/* Tarjeta 2 */}
-            <a href="#detalle-optimizacion" className="group block p-8 rounded-2xl bg-gray-50/50 hover:bg-white border border-transparent hover:border-gray-100 hover:shadow-2xl hover:shadow-gray-200/40 transition-all duration-500">
-              <div className="mb-8 text-gray-400 group-hover:text-blue-600 transition-colors duration-500">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            {/* Tarjeta 2: Optimización */}
+            <div className="group bg-white p-8 rounded-2xl border border-slate-100 shadow-sm transition-all duration-300 hover:shadow-lg hover:border-slate-200 hover:-translate-y-1">
+              <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mb-8">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">Optimización de equipos</h3>
-              <p className="text-sm text-gray-500 leading-relaxed mb-6 font-light">Actualización de hardware y optimización de software para darle una segunda vida a tu equipo.</p>
-              <div className="flex items-center text-sm font-medium text-gray-400 group-hover:text-blue-600 transition-colors">
-                <span>Saber más</span>
-                <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-              </div>
-            </a>
+              <h3 className="text-xl font-bold text-slate-900 mb-4">
+                Optimización de equipos
+              </h3>
+              <p className="text-slate-600 leading-relaxed mb-6 text-sm">
+                Actualización de hardware y optimización de software para darle una segunda vida a tu equipo.
+              </p>
+              <a href="#contacto" className="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors flex items-center gap-1 group-hover:text-blue-600">
+                Saber más <span className="transition-transform group-hover:translate-x-1">→</span>
+              </a>
+            </div>
 
-            {/* Tarjeta 3 */}
-            <a href="#detalle-cctv" className="group block p-8 rounded-2xl bg-gray-50/50 hover:bg-white border border-transparent hover:border-gray-100 hover:shadow-2xl hover:shadow-gray-200/40 transition-all duration-500">
-              <div className="mb-8 text-gray-400 group-hover:text-blue-600 transition-colors duration-500">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+            {/* Tarjeta 3: Cámaras */}
+            <div className="group bg-white p-8 rounded-2xl border border-slate-100 shadow-sm transition-all duration-300 hover:shadow-lg hover:border-slate-200 hover:-translate-y-1">
+              <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mb-8">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">Cámaras de seguridad</h3>
-              <p className="text-sm text-gray-500 leading-relaxed mb-6 font-light">Instalación y configuración de sistemas CCTV para proteger tu hogar o negocio.</p>
-              <div className="flex items-center text-sm font-medium text-gray-400 group-hover:text-blue-600 transition-colors">
-                <span>Saber más</span>
-                <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-              </div>
-            </a>
+              <h3 className="text-xl font-bold text-slate-900 mb-4">
+                Cámaras de seguridad
+              </h3>
+              <p className="text-slate-600 leading-relaxed mb-6 text-sm">
+                Instalación y configuración de sistemas CCTV para proteger tu hogar o negocio.
+              </p>
+              <a href="#contacto" className="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors flex items-center gap-1 group-hover:text-blue-600">
+                Saber más <span className="transition-transform group-hover:translate-x-1">→</span>
+              </a>
+            </div>
 
-            {/* Tarjeta 4 */}
-            <a href="#detalle-desarrollo" className="group block p-8 rounded-2xl bg-gray-50/50 hover:bg-white border border-transparent hover:border-gray-100 hover:shadow-2xl hover:shadow-gray-200/40 transition-all duration-500">
-              <div className="mb-8 text-gray-400 group-hover:text-blue-600 transition-colors duration-500">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+            {/* Tarjeta 4: Desarrollo Web */}
+            <div className="group bg-white p-8 rounded-2xl border border-slate-100 shadow-sm transition-all duration-300 hover:shadow-lg hover:border-slate-200 hover:-translate-y-1">
+              <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mb-8">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.75 17L9 21h6l-.75-4M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">Desarrollo web</h3>
-              <p className="text-sm text-gray-500 leading-relaxed mb-6 font-light">Desarrollo de sistemas, landing pages y aplicaciones web a medida.</p>
-              <div className="flex items-center text-sm font-medium text-gray-400 group-hover:text-blue-600 transition-colors">
-                <span>Saber más</span>
-                <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-              </div>
-            </a>
+              <h3 className="text-xl font-bold text-slate-900 mb-4">
+                Desarrollo web
+              </h3>
+              <p className="text-slate-600 leading-relaxed mb-6 text-sm">
+                Desarrollo de sistemas, landing pages y aplicaciones web a medida.
+              </p>
+              <a href="#contacto" className="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors flex items-center gap-1 group-hover:text-blue-600">
+                Saber más <span className="transition-transform group-hover:translate-x-1">→</span>
+              </a>
+            </div>
 
           </div>
         </div>
@@ -271,6 +299,7 @@ const manejarEnvio = async (e: React.FormEvent<HTMLFormElement>) => {
                 <li>Limpieza de virus y malware.</li>
                 <li>Reinstalación de sistemas operativos (Windows / Linux).</li>
                 <li>Mantenimiento preventivo anual.</li>
+                <li>Preservamos tu información</li>
               </ul>
             </div>
           </div>
@@ -348,7 +377,7 @@ const manejarEnvio = async (e: React.FormEvent<HTMLFormElement>) => {
             {/* Texto */}
             <div className="order-2 md:order-1">
               {/* Corrección de mayúsculas a mitad de oración */}
-              <h2 className="text-3xl font-light text-gray-900 mb-6">Desarrollo de landing page y sistemas web a medida</h2>
+              <h2 className="text-3xl font-light text-gray-900 mb-6">Desarrollo de landing page, sistemas y apps web a medida</h2>
               <p className="text-lg text-gray-600 mb-6 leading-relaxed">
                 Llevamos tu negocio al mundo digital. Desde una landing page para captar clientes, hasta 
                 sistemas de gestión a medida para administrar usuarios e inventarios. Utilizamos las tecnologías más modernas para potenciar tus procesos.
@@ -386,7 +415,9 @@ const manejarEnvio = async (e: React.FormEvent<HTMLFormElement>) => {
             
             {/* Texto */}
             <div>
-              <h2 className="text-3xl font-light mb-6">Sobre Compufix</h2>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-500 to-white pb-2">
+                Sobre Compufix
+              </h2>
               <div className="w-20 h-1 bg-blue-500 mb-8 rounded-full"></div>
               
               <p className="text-lg text-gray-300 mb-6 leading-relaxed">
@@ -423,7 +454,7 @@ const manejarEnvio = async (e: React.FormEvent<HTMLFormElement>) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center mb-20">
-            <h2 className="text-3xl font-light text-gray-900 tracking-tight mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-800 to-slate-900 pb-2">
               Cómo trabajamos
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -491,7 +522,7 @@ const manejarEnvio = async (e: React.FormEvent<HTMLFormElement>) => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-light text-gray-900 tracking-tight mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-800 to-slate-900 pb-2">
               Preguntas frecuentes
             </h2>
             <p className="text-lg text-gray-600">
@@ -515,18 +546,16 @@ const manejarEnvio = async (e: React.FormEvent<HTMLFormElement>) => {
               </p>
             </details>
 
-            {/* Pregunta 2 */}
             <details className="group border border-gray-200 rounded-2xl bg-gray-50 [&_summary::-webkit-details-marker]:hidden">
               <summary className="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-gray-900 font-medium">
-                <h3 className="text-lg">¿Instalan cámaras de seguridad fuera de Sáenz Peña?</h3>
+                <h3 className="text-lg">Si instalan Windows en mi equipo, ¿pierdo mi información?</h3>
                 <span className="relative h-5 w-5 shrink-0 text-blue-600">
                   <svg xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 opacity-100 group-open:opacity-0 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
                   <svg xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 opacity-0 group-open:opacity-100 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" /></svg>
                 </span>
               </summary>
               <p className="px-6 pb-6 text-gray-600 leading-relaxed">
-                Nuestro foco principal de trabajo está en Presidencia Roque Sáenz Peña. De todas formas, si tenés un proyecto particular en una localidad cercana, mandanos un mensaje por WhatsApp y evaluamos la viabilidad del traslado.
-              </p>
+                <strong>Para nada.</strong> Tu tranquilidad es nuestra prioridad. Antes de realizar cualquier instalación o formateo, llevamos a cabo un <strong>backup preventivo</strong> de todos los archivos que quieras conservar (fotos, documentos, carpetas de trabajo, etc.). Te garantizamos que tu información estará segura y disponible una vez que te entreguemos el equipo listo para usar.              </p>
             </details>
 
             {/* Pregunta 3 */}
@@ -565,7 +594,9 @@ const manejarEnvio = async (e: React.FormEvent<HTMLFormElement>) => {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">Envianos tu consulta</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-500 to-white pb-2">
+                Envianos tu consulta.
+              </h2>
             <p className="text-gray-400">
               Completá el formulario y nos pondremos en contacto con vos a la brevedad para asesorarte.
             </p>
@@ -644,7 +675,7 @@ const manejarEnvio = async (e: React.FormEvent<HTMLFormElement>) => {
       <section id="sociales" className="py-24 bg-gray-50 border-t border-gray-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-800 to-slate-900 pb-2">
             ¡Conectemos!
           </h2>
           <p className="text-lg text-gray-600 mb-10 max-w-2xl mx-auto">
