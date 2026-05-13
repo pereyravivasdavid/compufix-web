@@ -45,16 +45,11 @@ export default function PortfolioComingSoon() {
         </motion.p>
 
         {/* Botón para volver al inicio */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 bg-transparent text-white px-8 py-3 rounded-none font-medium border border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.2)] transition-all duration-300 hover:bg-blue-600 hover:border-blue-400 hover:shadow-[0_0_25px_rgba(59,130,246,0.6)] hover:-translate-y-1 group"
         >
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 bg-transparent text-white px-8 py-3 rounded-none font-medium border border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.2)] transition-all duration-300 hover:bg-blue-600 hover:border-blue-400 hover:shadow-[0_0_25px_rgba(59,130,246,0.6)] hover:-translate-y-1 group"
-          >
-            <svg 
+          <svg 
               xmlns="http://www.w3.org/2000/svg" 
               width="20" 
               height="20" 
@@ -69,9 +64,8 @@ export default function PortfolioComingSoon() {
               <line x1="19" y1="12" x2="5" y2="12"></line>
               <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
-            Volver al inicio
-          </Link>
-        </motion.div>
+          Volver al inicio
+        </Link>
       </div>
 
       {/* Detalles técnicos (Esquinas) */}
