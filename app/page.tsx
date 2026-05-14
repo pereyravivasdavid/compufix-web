@@ -766,7 +766,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- SECCIÓN FORMULARIO DE CONTACTO --- */}
+      {/* --- SECCIÓN FORMULARIO DE CONTACTO (DARK MODE & NEÓN + ALERTAS) --- */}
       <section id="contacto" className="py-24 bg-black overflow-hidden relative">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-900/10 blur-[120px] pointer-events-none"></div>
 
@@ -857,11 +857,48 @@ export default function Home() {
               ></textarea>
             </div>
 
+            {/* --- MENSAJES DE ESTADO (ÉXITO / ERROR) --- */}
+            {estado === 'exito' && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                className="p-4 border-l-4 border-[#25D366] bg-[#25D366]/10 text-[#25D366] text-sm font-medium flex items-center gap-3 shadow-[0_0_15px_rgba(37,211,102,0.15)]"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                ¡Mensaje enviado con éxito! Te responderemos a la brevedad.
+              </motion.div>
+            )}
+
+            {estado === 'error' && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                className="p-4 border-l-4 border-red-500 bg-red-500/10 text-red-400 text-sm font-medium flex items-center gap-3 shadow-[0_0_15px_rgba(239,68,68,0.15)]"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                Hubo un error al enviar el mensaje. Por favor, intentá nuevamente o contactanos por WhatsApp.
+              </motion.div>
+            )}
+
+            {/* --- BOTÓN DINÁMICO --- */}
             <button
               type="submit"
-              className="w-full mt-4 bg-blue-600 text-white font-bold py-4 rounded-none border border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all duration-300 hover:bg-blue-500 hover:shadow-[0_0_25px_rgba(59,130,246,0.6)] hover:-translate-y-1 active:scale-[0.98]"
+              disabled={estado === 'enviando'}
+              className={`w-full mt-2 text-white font-bold py-4 rounded-none border shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all duration-300 active:scale-[0.98] flex justify-center items-center gap-2
+                ${estado === 'enviando' 
+                  ? 'bg-blue-800 border-blue-700 cursor-wait opacity-80 shadow-none' 
+                  : 'bg-blue-600 border-blue-400 hover:bg-blue-500 hover:shadow-[0_0_25px_rgba(59,130,246,0.6)] hover:-translate-y-1'
+                }`}
             >
-              Enviar mensaje
+              {estado === 'enviando' ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Enviando...
+                </>
+              ) : (
+                'Enviar mensaje'
+              )}
             </button>
           </motion.form>
 
