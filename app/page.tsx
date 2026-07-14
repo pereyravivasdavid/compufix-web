@@ -160,60 +160,100 @@ export default function Home() {
         </div>
       </header>
 
-      {/* --- SECCIÓN HERO INTERACTIVO (GRILLA REACTIVA) --- */}
-      <section className="relative w-full h-screen min-h-[700px] overflow-hidden flex items-center justify-center border-b border-zinc-900">
+      {/* --- SECCIÓN HERO INTERACTIVO (SWISS GRID / EDITORIAL TÉCNICO) --- */}
+      <section className="relative w-full min-h-screen flex flex-col bg-black border-b border-zinc-900 pt-16">
         
-        {/* La Grilla (Playground) */}
-        <div className="absolute inset-0 w-full h-full grid grid-cols-10 sm:grid-cols-15 md:grid-cols-20 z-0">
-          {gridItems.map((_, i) => (
-            <div
-              key={i}
-              className="w-full h-full border-[0.5px] border-zinc-900/30 hover:bg-zinc-700/60 hover:border-zinc-500 transition-all duration-[1500ms] hover:duration-0 cursor-crosshair"
-            ></div>
-          ))}
-        </div>
-
-        {/* Máscara (Vignette) */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_10%,black_80%)] pointer-events-none z-10"></div>
-
-        {/* Contenido Central */}
-        <motion.div 
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-          className="relative z-20 w-full max-w-3xl mx-4 bg-white px-6 py-12 md:p-16 text-center border-2 border-zinc-300 shadow-[16px_16px_0px_#18181b] flex flex-col items-center"
-        >
-          <div className="flex items-center gap-3 mb-6">
-            <span className="w-2 h-2 rounded-full bg-[#E1F030] animate-pulse shadow-[0_0_8px_#E1F030]"></span>
-            <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest font-bold">
-              Status: Online
-            </span>
-          </div>
-
-          <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-black mb-6 uppercase leading-none">
-            Compufix_SP
-          </h1>
+        {/* Contenedor Principal dividido en Grilla Exacta */}
+        <div className="flex-1 flex flex-col md:flex-row w-full max-w-[1400px] mx-auto border-x border-zinc-900">
           
-          <p className="text-lg md:text-xl font-mono text-zinc-600 mb-10 max-w-lg leading-relaxed">
-            Desarrollo web de alto rendimiento y mantenimiento técnico especializado para llevar tu tecnología al siguiente nivel.
-          </p>
+          {/* Columna Izquierda: Titular y Copy */}
+          <div className="w-full md:w-2/3 border-b md:border-b-0 md:border-r border-zinc-900 p-8 md:p-16 flex flex-col justify-center relative">
+            
+            {/* Patrón de puntos técnico en el fondo de esta celda */}
+            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
+            
+            <div className="relative z-10">
+              <div className="inline-flex items-center gap-4 px-4 py-2 border border-zinc-800 bg-zinc-950 mb-12">
+                <span className="w-2 h-2 bg-[#E1F030] animate-pulse"></span>
+                <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">
+                  STATUS: ONLINE
+                </span>
+              </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-            <a 
-              href="#contacto"
-              className="bg-black text-white px-8 py-4 font-mono font-bold text-sm uppercase tracking-widest hover:bg-zinc-800 transition-colors border border-black text-center"
-            >
-              Iniciar Proyecto
-            </a>
-            <a 
-              href="#servicios"
-              className="bg-transparent text-black px-8 py-4 font-mono font-bold text-sm uppercase tracking-widest hover:bg-zinc-100 transition-colors border border-zinc-300 text-center"
-            >
-              Explorar Servicios
-            </a>
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white uppercase leading-[0.9] mb-8">
+                COMPUFIX.SP <br />
+                <span className="text-zinc-600">desarrollo &</span> <br />
+                INFRAESTRUCTURA.
+              </h1>
+              
+              <p className="text-lg font-mono text-zinc-400 mb-12 max-w-xl leading-relaxed">
+                Desarrollo web full-stack de alto rendimiento e infraestructura técnica especializada. Soluciones precisas, sin vueltas.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-0 border border-zinc-800 w-fit">
+                <a 
+                  href="#contacto"
+                  className="bg-white text-black px-8 py-4 font-mono font-bold text-sm uppercase tracking-widest hover:bg-[#E1F030] transition-colors text-center"
+                >
+                  Iniciar Proyecto
+                </a>
+                <a 
+                  href="#servicios"
+                  className="bg-black text-white px-8 py-4 font-mono font-bold text-sm uppercase tracking-widest hover:bg-zinc-900 transition-colors text-center border-t sm:border-t-0 sm:border-l border-zinc-800"
+                >
+                  Ver Servicios
+                </a>
+              </div>
+            </div>
           </div>
-        </motion.div>
 
+          {/* Columna Derecha: Stack y Datos (Dividida en 2 filas) */}
+          <div className="w-full md:w-1/3 flex flex-col">
+            
+            {/* Celda Superior: Stack Técnico */}
+            <div className="flex-1 border-b border-zinc-900 p-8 flex flex-col justify-center bg-zinc-950/30 hover:bg-zinc-900/50 transition-colors">
+              <h3 className="text-white font-mono font-bold text-xs uppercase tracking-widest mb-6">
+                // Software Stack
+              </h3>
+              <ul className="space-y-4 font-mono text-sm text-zinc-500">
+                <li className="flex justify-between border-b border-zinc-900 pb-2">
+                  <span className="text-zinc-300">Framework</span>
+                  <span>Next.js / React</span>
+                </li>
+                <li className="flex justify-between border-b border-zinc-900 pb-2">
+                  <span className="text-zinc-300">CMS</span>
+                  <span>WordPress Avanzado</span>
+                </li>
+                <li className="flex justify-between border-b border-zinc-900 pb-2">
+                  <span className="text-zinc-300">Deploy</span>
+                  <span>Vercel / Git</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Celda Inferior: Infraestructura */}
+            <div className="flex-1 p-8 flex flex-col justify-center bg-zinc-950/30 hover:bg-zinc-900/50 transition-colors">
+              <h3 className="text-[#E1F030] font-mono font-bold text-xs uppercase tracking-widest mb-6">
+                [ Hardware & Redes ]
+              </h3>
+              <ul className="space-y-4 font-mono text-sm text-zinc-500">
+                <li className="flex justify-between border-b border-zinc-900 pb-2">
+                  <span className="text-zinc-300">Equipos</span>
+                  <span>Mantenimiento & Refurbish</span>
+                </li>
+                <li className="flex justify-between border-b border-zinc-900 pb-2">
+                  <span className="text-zinc-300">Seguridad</span>
+                  <span>Instalación CCTV</span>
+                </li>
+                <li className="flex justify-between border-b border-zinc-900 pb-2">
+                  <span className="text-zinc-300">Redes</span>
+                  <span>Cableado Estructurado</span>
+                </li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
       </section>
 
       {/* --- SECCIÓN NUESTROS SERVICIOS (GLASSMORPHISM ABSTRACTO) --- */}
@@ -239,6 +279,30 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             
+            {/* Tarjeta 4 */}
+            <motion.article 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="group relative bg-zinc-950/40 backdrop-blur-md border border-zinc-800 p-8 md:p-12 min-h-[340px] flex flex-col justify-between overflow-hidden transition-colors duration-500 hover:border-zinc-600"
+            >
+              <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-white/5 rounded-full blur-[80px] group-hover:bg-white/10 group-hover:scale-110 transition-all duration-700 ease-out pointer-events-none"></div>
+              <div className="relative z-10">
+                <span className="text-zinc-700 font-mono text-2xl font-bold tracking-tighter mb-6 block group-hover:text-zinc-500 transition-colors">01 /</span>
+                <h3 className="text-2xl md:text-3xl font-black text-white mb-4 tracking-tight">Desarrollo Web</h3>
+                <p className="text-zinc-400 leading-relaxed max-w-sm">
+                  Llevamos tu negocio al mundo digital. Construimos desde landing pages efectivas hasta sistemas de gestión web a medida.
+                </p>
+              </div>
+              <div className="relative z-10 mt-10">
+                <a href="#detalle-desarrollo" className="inline-flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-white group-hover:text-zinc-300 transition-colors">
+                  Explorar
+                  <svg className="w-5 h-5 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </a>
+              </div>
+            </motion.article>
+            
             {/* Tarjeta 1 */}
             <motion.article 
               initial={{ opacity: 0, y: 30 }}
@@ -249,7 +313,7 @@ export default function Home() {
             >
               <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-[#E1F030]/5 rounded-full blur-[80px] group-hover:bg-[#E1F030]/15 group-hover:scale-110 transition-all duration-700 ease-out pointer-events-none"></div>
               <div className="relative z-10">
-                <span className="text-zinc-700 font-mono text-2xl font-bold tracking-tighter mb-6 block group-hover:text-zinc-500 transition-colors">01 /</span>
+                <span className="text-zinc-700 font-mono text-2xl font-bold tracking-tighter mb-6 block group-hover:text-zinc-500 transition-colors">02 /</span>
                 <h3 className="text-2xl md:text-3xl font-black text-white mb-4 tracking-tight">Mantenimiento de PC</h3>
                 <p className="text-zinc-400 leading-relaxed max-w-sm">
                   Diagnóstico preciso, limpieza física profunda y solución a fallas de hardware para que tu equipo vuelva a funcionar como el primer día.
@@ -273,7 +337,7 @@ export default function Home() {
             >
               <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-blue-500/5 rounded-full blur-[80px] group-hover:bg-blue-500/15 group-hover:scale-110 transition-all duration-700 ease-out pointer-events-none"></div>
               <div className="relative z-10">
-                <span className="text-zinc-700 font-mono text-2xl font-bold tracking-tighter mb-6 block group-hover:text-zinc-500 transition-colors">02 /</span>
+                <span className="text-zinc-700 font-mono text-2xl font-bold tracking-tighter mb-6 block group-hover:text-zinc-500 transition-colors">03 /</span>
                 <h3 className="text-2xl md:text-3xl font-black text-white mb-4 tracking-tight">Optimización de Equipos</h3>
                 <p className="text-zinc-400 leading-relaxed max-w-sm">
                   Actualización estratégica de componentes (SSD, ampliación de RAM) y software para darle una segunda vida a computadoras lentas.
@@ -297,7 +361,7 @@ export default function Home() {
             >
               <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-red-500/5 rounded-full blur-[80px] group-hover:bg-red-500/15 group-hover:scale-110 transition-all duration-700 ease-out pointer-events-none"></div>
               <div className="relative z-10">
-                <span className="text-zinc-700 font-mono text-2xl font-bold tracking-tighter mb-6 block group-hover:text-zinc-500 transition-colors">03 /</span>
+                <span className="text-zinc-700 font-mono text-2xl font-bold tracking-tighter mb-6 block group-hover:text-zinc-500 transition-colors">04 /</span>
                 <h3 className="text-2xl md:text-3xl font-black text-white mb-4 tracking-tight">Cámaras de Seguridad</h3>
                 <p className="text-zinc-400 leading-relaxed max-w-sm">
                   Instalación profesional de sistemas de videovigilancia CCTV de alta definición. Configuración de DVRs y monitoreo remoto 24/7.
@@ -311,48 +375,81 @@ export default function Home() {
               </div>
             </motion.article>
 
-            {/* Tarjeta 4 */}
-            <motion.article 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="group relative bg-zinc-950/40 backdrop-blur-md border border-zinc-800 p-8 md:p-12 min-h-[340px] flex flex-col justify-between overflow-hidden transition-colors duration-500 hover:border-zinc-600"
-            >
-              <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-white/5 rounded-full blur-[80px] group-hover:bg-white/10 group-hover:scale-110 transition-all duration-700 ease-out pointer-events-none"></div>
-              <div className="relative z-10">
-                <span className="text-zinc-700 font-mono text-2xl font-bold tracking-tighter mb-6 block group-hover:text-zinc-500 transition-colors">04 /</span>
-                <h3 className="text-2xl md:text-3xl font-black text-white mb-4 tracking-tight">Desarrollo Web</h3>
-                <p className="text-zinc-400 leading-relaxed max-w-sm">
-                  Llevamos tu negocio al mundo digital. Construimos desde landing pages efectivas hasta sistemas de gestión web a medida.
-                </p>
-              </div>
-              <div className="relative z-10 mt-10">
-                <a href="#detalle-desarrollo" className="inline-flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-white group-hover:text-zinc-300 transition-colors">
-                  Explorar
-                  <svg className="w-5 h-5 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                </a>
-              </div>
-            </motion.article>
+            
 
           </div>
         </div>
       </section>
 
-      {/* --- SECCIONES DE DETALLE (MINIMALISTA / FACTORY.AI) --- */}
+      {/* --- SECCIONES DE DETALLE (MINIMALISTA / FIXED IMAGES) --- */}
       <div className="flex flex-col gap-32 py-32 border-b border-zinc-900">
 
-        <section id="detalle-mantenimiento" className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* 1. DESARROLLO WEB */}
+        <section id="detalle-desarrollo" className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
+            
+            {/* Texto Flotante (Hace scroll) */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-20%" }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="lg:col-span-5 lg:sticky lg:top-40 z-20"
+              className="lg:col-span-6 z-20 pb-10"
             >
               <div className="flex items-center gap-3 mb-6">
-                <span className="w-2 h-2 rounded-full bg-[#E1F030] shadow-[0_0_8px_#E1F030]"></span>
+                <span className="w-2 h-2 rounded-none bg-white shadow-[0_0_8px_rgba(255,255,255,0.4)]"></span>
+                <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">Sistemas</span>
+              </div>
+              <h2 className="text-3xl md:text-5xl font-medium tracking-tight text-white mb-6 leading-tight">
+                Desarrollo web a medida.
+              </h2>
+              <div className="text-sm font-mono text-zinc-400 leading-relaxed space-y-4 max-w-md mb-8">
+                <p>Llevamos tu negocio al mundo digital utilizando tecnologías modernas y eficientes.</p>
+                <p>Desde una landing page de alta conversión para captar clientes, hasta sistemas complejos de gestión para administrar usuarios e inventarios.</p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-0 border border-zinc-800 w-fit">
+                <a href="#contacto" className="bg-white text-black px-6 py-3 text-xs font-mono font-bold hover:bg-zinc-200 transition-colors text-center">
+                  Cotizar
+                </a>
+                <Link href="/portfolio" className="bg-transparent text-zinc-400 px-6 py-3 text-xs font-mono font-bold hover:text-white hover:bg-zinc-900 transition-colors text-center border-t sm:border-t-0 sm:border-l border-zinc-800">
+                  Ver portfolio
+                </Link>
+              </div>
+            </motion.div>
+
+            {/* Imagen Fija (Sticky) */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true, margin: "-20%" }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="lg:col-span-6 lg:sticky lg:top-40 flex justify-center lg:justify-end w-full"
+            >
+              <div className="relative w-full max-w-[380px] aspect-[4/5] border border-zinc-800 bg-zinc-950 p-2">
+                <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none"></div>
+                <div className="relative w-full h-full">
+                  <Image src="/desarrollo-nuevo.webp" alt="Desarrollo Web" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover opacity-80" />
+                </div>
+              </div>
+            </motion.div>
+
+          </div>
+        </section>
+
+        {/* 2. MANTENIMIENTO DE PC */}
+        <section id="detalle-mantenimiento" className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
+            
+            {/* Texto Flotante */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-20%" }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="lg:col-span-6 z-20 pb-10"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <span className="w-2 h-2 rounded-none bg-[#E1F030]"></span>
                 <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">Mantenimiento</span>
               </div>
               <h2 className="text-3xl md:text-5xl font-medium tracking-tight text-white mb-6 leading-tight">
@@ -368,32 +465,40 @@ export default function Home() {
                 </ul>
               </div>
             </motion.div>
+
+            {/* Imagen Fija */}
             <motion.div 
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true, margin: "-20%" }}
               transition={{ duration: 1, ease: "easeOut" }}
-              className="lg:col-span-7 relative h-[400px] md:h-[600px] w-full"
+              className="lg:col-span-6 lg:sticky lg:top-40 flex justify-center lg:justify-end w-full"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent z-10 pointer-events-none"></div>
-              <div className="absolute inset-0 bg-gradient-to-l from-black via-transparent to-transparent z-10 pointer-events-none"></div>
-              <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black z-10 pointer-events-none"></div>
-              <Image src="/img-reparacion.webp" alt="Servicio técnico de PC" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover opacity-60 mix-blend-lighten" />
+              <div className="relative w-full max-w-[380px] aspect-[4/5] border border-zinc-800 bg-zinc-950 p-2">
+                <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none"></div>
+                <div className="relative w-full h-full">
+                  <Image src="/img-reparacion.webp" alt="Servicio técnico de PC" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover opacity-80" />
+                </div>
+              </div>
             </motion.div>
+
           </div>
         </section>
 
+        {/* 3. OPTIMIZACIÓN */}
         <section id="detalle-optimizacion" className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
+            
+            {/* Texto Flotante */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-20%" }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="lg:col-span-5 lg:sticky lg:top-40 z-20"
+              className="lg:col-span-6 z-20 pb-10"
             >
               <div className="flex items-center gap-3 mb-6">
-                <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]"></span>
+                <span className="w-2 h-2 rounded-none bg-zinc-400"></span>
                 <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">Hardware</span>
               </div>
               <h2 className="text-3xl md:text-5xl font-medium tracking-tight text-white mb-6 leading-tight">
@@ -409,32 +514,40 @@ export default function Home() {
                 </ul>
               </div>
             </motion.div>
+
+            {/* Imagen Fija */}
             <motion.div 
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true, margin: "-20%" }}
               transition={{ duration: 1, ease: "easeOut" }}
-              className="lg:col-span-7 relative h-[400px] md:h-[600px] w-full"
+              className="lg:col-span-6 lg:sticky lg:top-40 flex justify-center lg:justify-end w-full"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent z-10 pointer-events-none"></div>
-              <div className="absolute inset-0 bg-gradient-to-l from-black via-transparent to-transparent z-10 pointer-events-none"></div>
-              <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black z-10 pointer-events-none"></div>
-              <Image src="/img-opti.webp" alt="Hardware SSD y RAM" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover opacity-60 mix-blend-lighten" />
+              <div className="relative w-full max-w-[380px] aspect-[4/5] border border-zinc-800 bg-zinc-950 p-2">
+                <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none"></div>
+                <div className="relative w-full h-full">
+                  <Image src="/img-opti.webp" alt="Hardware SSD y RAM" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover opacity-80" />
+                </div>
+              </div>
             </motion.div>
+
           </div>
         </section>
 
+        {/* 4. INSTALACIÓN CCTV */}
         <section id="detalle-cctv" className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
+            
+            {/* Texto Flotante */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-20%" }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="lg:col-span-5 lg:sticky lg:top-40 z-20"
+              className="lg:col-span-6 z-20 pb-10"
             >
               <div className="flex items-center gap-3 mb-6">
-                <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]"></span>
+                <span className="w-2 h-2 rounded-none bg-zinc-600"></span>
                 <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">Seguridad</span>
               </div>
               <h2 className="text-3xl md:text-5xl font-medium tracking-tight text-white mb-6 leading-tight">
@@ -450,80 +563,43 @@ export default function Home() {
                 </ul>
               </div>
             </motion.div>
-            <motion.div 
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-20%" }}
-              transition={{ duration: 1, ease: "easeOut" }}
-              className="lg:col-span-7 relative h-[400px] md:h-[600px] w-full"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent z-10 pointer-events-none"></div>
-              <div className="absolute inset-0 bg-gradient-to-l from-black via-transparent to-transparent z-10 pointer-events-none"></div>
-              <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black z-10 pointer-events-none"></div>
-              <Image src="/img-camaras.webp" alt="Instalación CCTV" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover opacity-60 mix-blend-lighten" />
-            </motion.div>
-          </div>
-        </section>
 
-        <section id="detalle-desarrollo" className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-20%" }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="lg:col-span-5 lg:sticky lg:top-40 z-20"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <span className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]"></span>
-                <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">Sistemas</span>
-              </div>
-              <h2 className="text-3xl md:text-5xl font-medium tracking-tight text-white mb-6 leading-tight">
-                Apps y webs a medida.
-              </h2>
-              <div className="text-sm font-mono text-zinc-400 leading-relaxed space-y-4 max-w-md mb-8">
-                <p>Llevamos tu negocio al mundo digital utilizando tecnologías modernas y eficientes.</p>
-                <p>Desde una landing page de alta conversión para captar clientes, hasta sistemas complejos de gestión para administrar usuarios e inventarios.</p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <a href="#contacto" className="inline-block bg-white text-black px-6 py-2 text-xs font-mono uppercase tracking-widest font-bold hover:bg-zinc-200 transition-colors text-center">
-                  Cotizar
-                </a>
-                <Link href="/portfolio" className="inline-block bg-transparent text-zinc-400 border border-zinc-800 px-6 py-2 text-xs font-mono uppercase tracking-widest font-bold hover:text-white hover:border-zinc-500 transition-colors text-center">
-                  Ver portfolio
-                </Link>
-              </div>
-            </motion.div>
+            {/* Imagen Fija */}
             <motion.div 
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true, margin: "-20%" }}
               transition={{ duration: 1, ease: "easeOut" }}
-              className="lg:col-span-7 relative h-[400px] md:h-[600px] w-full"
+              className="lg:col-span-6 lg:sticky lg:top-40 flex justify-center lg:justify-end w-full"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent z-10 pointer-events-none"></div>
-              <div className="absolute inset-0 bg-gradient-to-l from-black via-transparent to-transparent z-10 pointer-events-none"></div>
-              <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black z-10 pointer-events-none"></div>
-              <Image src="/desarrollo-nuevo.webp" alt="Desarrollo Web" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover opacity-60 mix-blend-lighten" />
+              <div className="relative w-full max-w-[380px] aspect-[4/5] border border-zinc-800 bg-zinc-950 p-2">
+                <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none"></div>
+                <div className="relative w-full h-full">
+                  <Image src="/img-camaras.webp" alt="Instalación CCTV" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover opacity-80" />
+                </div>
+              </div>
             </motion.div>
+
           </div>
         </section>
 
       </div>
 
-      {/* --- SECCIÓN SOBRE NOSOTROS --- */}
-      <section id="sobre-nosotros" className="w-full py-32 overflow-hidden border-b border-zinc-900">
+      {/* --- SECCIÓN SOBRE NOSOTROS (MINIMALISTA) --- */}
+      <section id="sobre-nosotros" className="w-full py-32 border-b border-zinc-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
+            
+            {/* Texto Flotante (Hace scroll) */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-20%" }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="lg:col-span-5 lg:sticky lg:top-40 z-20"
+              className="lg:col-span-6 z-20 pb-10"
             >
               <div className="flex items-center gap-3 mb-6">
-                <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]"></span>
+                <span className="w-2 h-2 rounded-none bg-blue-500"></span>
                 <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">Leandro David</span>
               </div>
               <h2 className="text-3xl md:text-5xl font-medium tracking-tight text-white mb-6 leading-tight">
@@ -535,32 +611,38 @@ export default function Home() {
                 <p>Con especializaciones en redes, reparación y mantenimiento de PC, sistemas de seguridad y desarrollo web full stack, combino el hardware y el software para potenciar tu presencia digital y resguardar tu equipamiento.</p>
                 <p>Este proyecto comenzó en 2016 desde mi casa, donde armé un pequeño taller equipado para trabajar a diario con el objetivo de darle una segunda vida a tus dispositivos y crear herramientas digitales a medida.</p>
               </div>
-              <a
-                href="#contacto"
-                className="inline-block bg-white text-black px-6 py-2 text-xs font-mono uppercase tracking-widest font-bold hover:bg-zinc-200 transition-colors text-center"
-              >
-                Contactar
-              </a>
+              <div className="border border-zinc-800 w-fit">
+                <a
+                  href="#contacto"
+                  className="block bg-white text-black px-6 py-3 text-xs font-mono font-bold hover:bg-zinc-200 transition-colors text-center uppercase tracking-widest"
+                >
+                  Contactar
+                </a>
+              </div>
             </motion.div>
 
+            {/* Imagen Fija (Sticky) */}
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true, margin: "-20%" }}
               transition={{ duration: 1, ease: "easeOut" }}
-              className="lg:col-span-7 relative h-[400px] md:h-[600px] w-full"
+              className="lg:col-span-6 lg:sticky lg:top-40 flex justify-center lg:justify-end w-full"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent z-10 pointer-events-none"></div>
-              <div className="absolute inset-0 bg-gradient-to-l from-black via-transparent to-transparent z-10 pointer-events-none"></div>
-              <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black z-10 pointer-events-none"></div>
-              <Image
-                src="/img-about.webp"
-                alt="Leandro David trabajando en su taller"
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover opacity-60 mix-blend-lighten"
-              />
+              <div className="relative w-full max-w-[380px] aspect-[4/5] border border-zinc-800 bg-zinc-950 p-2">
+                <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none"></div>
+                <div className="relative w-full h-full">
+                  <Image
+                    src="/img-about.webp"
+                    alt="Leandro David trabajando en su taller"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover opacity-80"
+                  />
+                </div>
+              </div>
             </motion.div>
+
           </div>
         </div>
       </section>
