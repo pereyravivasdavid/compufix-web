@@ -129,11 +129,11 @@ export default function Home() {
 
             <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase leading-[0.85] mb-8">
               Compufix <br />
-              <span className="text-zinc-600">Webdev & HW.</span>
+              <span className="text-zinc-600">sp</span>
             </h1>
 
             <h2 className="text-lg md:text-xl font-mono text-zinc-400 mb-12 max-w-2xl mx-auto leading-relaxed font-normal">
-              Especialistas en <strong>reparación de PC, instalación de cámaras CCTV y desarrollo web</strong> de alto rendimiento. Soluciones técnicas integrales y sin fricciones.
+              Especialistas en <strong>desarrollo web de alto rendimiento, reparación de PCs e instalación de cámaras CCTV</strong> . Soluciones técnicas integrales y sin vueltas.
             </h2>
             
             <div className="animate-pulse">
@@ -171,14 +171,22 @@ export default function Home() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ margin: "0px -15% 0px -15%", amount: "some" }} 
                 transition={{ duration: 0.5, ease: "easeOut" }}
-                className="w-[85vw] md:w-[40vw] h-[55vh] md:h-[60vh] shrink-0 bg-[#0A0A0A] flex flex-col relative group overflow-hidden shadow-2xl border-none"
+                // AGREGADO: min-h-[400px] md:min-h-[480px] para evitar que colapse en laptops
+                className="w-[85vw] md:w-[40vw] h-[55vh] md:h-[60vh] min-h-[400px] md:min-h-[480px] shrink-0 bg-[#0A0A0A] flex flex-col relative group overflow-hidden shadow-2xl border-none"
               >
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#18181b_1px,transparent_1px),linear-gradient(to_bottom,#18181b_1px,transparent_1px)] bg-[size:2rem_2rem] opacity-20 pointer-events-none"></div>
                 
-                <div className="w-full h-full p-8 md:p-14 flex flex-col justify-center relative z-10 bg-[#0A0A0A]">
-                  <span className="text-6xl md:text-8xl font-black text-zinc-900 mb-6 font-mono leading-none">{servicio.num}</span>
-                  <h3 className="text-3xl md:text-5xl font-bold text-white mb-6 uppercase tracking-widest">{servicio.titulo}</h3>
-                  <p className="text-lg font-mono text-zinc-400 leading-relaxed mb-12">{servicio.desc}</p>
+                {/* AJUSTE: Reducimos un poco el padding (p-10) y los márgenes inferiores (mb-8) */}
+                <div className="w-full h-full p-8 md:p-10 flex flex-col justify-center relative z-10 bg-[#0A0A0A]">
+                  <span className="text-6xl md:text-7xl font-black text-zinc-900 mb-4 font-mono leading-none">
+                    {servicio.num}
+                  </span>
+                  <h3 className="text-3xl md:text-4xl font-bold text-white mb-4 uppercase tracking-widest">
+                    {servicio.titulo}
+                  </h3>
+                  <p className="text-base md:text-lg font-mono text-zinc-400 leading-relaxed mb-8">
+                    {servicio.desc}
+                  </p>
                   <a href={servicio.link} aria-label={`Ver detalles sobre ${servicio.titulo}`} className="text-sm font-mono text-white uppercase tracking-widest underline decoration-zinc-600 underline-offset-8 hover:decoration-white transition-colors w-fit mt-auto pointer-events-auto">
                     Ver detalles →
                   </a>
@@ -305,11 +313,18 @@ export default function Home() {
                 </ul>
               </motion.div>
 
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-12">
-                <a href="#contacto" aria-label="Iniciar proyecto de Desarrollo Web" className="inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-8 py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-white transition-colors">
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-12 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                
+                {/* Botón Principal */}
+                <a href="#contacto" aria-label="Iniciar proyecto de Desarrollo Web" className="w-full sm:w-auto justify-center inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-8 py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-white transition-colors">
                   Iniciar Desarrollo
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </a>
+
+                {/* Botón Secundario: Portfolio (Amarillo Ácido) */}
+                <a href="/portfolio" aria-label="Ver Portfolio de Proyectos Web" className="w-full sm:w-auto justify-center inline-flex items-center gap-4 border border-[#E1F030]/50 bg-transparent px-8 py-4 text-xs font-mono text-[#E1F030] uppercase tracking-widest hover:border-[#E1F030] hover:bg-[#E1F030] hover:text-black transition-all duration-300 shadow-[0_0_15px_rgba(225,240,48,0.05)] hover:shadow-[0_0_25px_rgba(225,240,48,0.2)]">
+                  Ver Portfolio
+                </a>
+                
               </motion.div>
             </div>
 
@@ -518,7 +533,7 @@ export default function Home() {
               </div>
               <div className="md:w-2/3">
                 <p className="text-base font-mono text-zinc-400 leading-relaxed">
-                  Ponemos manos a la obra. Ya sea reparando un servidor o programando una web, <strong className="text-white font-normal">te mandamos actualizaciones del avance de tu proyecto</strong>.
+                  Ponemos manos a la obra. Ya sea reparando tu PC o programando una web, <strong className="text-white font-normal">te mandamos actualizaciones del avance de tu proyecto</strong>.
                 </p>
               </div>
             </motion.article>
@@ -724,14 +739,14 @@ export default function Home() {
               <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-2">Navegación</h4>
               <button onClick={volverArriba} className="text-left text-sm font-mono text-zinc-500 hover:text-white transition-colors w-fit">Inicio</button>
               <a href="#proceso" className="text-sm font-mono text-zinc-500 hover:text-white transition-colors w-fit">Metodología</a>
-              <a href="#faq" className="text-sm font-mono text-zinc-500 hover:text-white transition-colors w-fit">Soporte y Dudas</a>
-              <a href="#contacto" className="text-sm font-mono text-zinc-500 hover:text-white transition-colors w-fit">Contacto Rápido</a>
+              <a href="#faq" className="text-sm font-mono text-zinc-500 hover:text-white transition-colors w-fit">Soporte y dudas</a>
+              <a href="#contacto" className="text-sm font-mono text-zinc-500 hover:text-white transition-colors w-fit">Contacto rápido</a>
             </nav>
 
             <div className="flex flex-col gap-3">
-              <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-2">Legal & Políticas</h4>
-              <a href="mailto:contacto@compufix.com.ar" className="text-sm font-mono text-zinc-500 hover:text-white transition-colors w-fit">
-                contacto@compufix.com.ar
+              <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-2">Legal & políticas</h4>
+              <a href="mailto:compufix.sp@gmail.com" className="text-sm font-mono text-zinc-500 hover:text-white transition-colors w-fit">
+                compufix.sp@gmail.com
               </a>
               <a href="/politica-de-privacidad" className="text-sm font-mono text-zinc-500 hover:text-white transition-colors w-fit">
                 Política de Privacidad
