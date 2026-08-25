@@ -1,1109 +1,789 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useRef, useEffect, useState } from "react";
+import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "framer-motion";
+
+// Componente FAQ Optimizado
+const FaqItem = ({ pregunta, respuesta }: { pregunta: string, respuesta: string }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className="border-b border-zinc-900">
+      <button 
+        onClick={() => setIsOpen(!isOpen)} 
+        className="w-full py-8 flex items-center justify-between group text-left"
+        aria-expanded={isOpen}
+      >
+        <h3 className="text-xl md:text-2xl font-bold text-zinc-400 group-hover:text-white transition-colors duration-300 pr-8">
+          {pregunta}
+        </h3>
+        <div className="relative w-6 h-6 shrink-0 flex items-center justify-center pointer-events-none">
+          <span className={`absolute w-full h-[2px] bg-zinc-500 group-hover:bg-white transition-all duration-300 ${isOpen ? "rotate-180 bg-white" : ""}`}></span>
+          <span className={`absolute w-full h-[2px] bg-zinc-500 group-hover:bg-white transition-all duration-300 ${isOpen ? "rotate-0 opacity-0" : "rotate-90"}`}></span>
+        </div>
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <p className="pb-8 text-base md:text-lg font-mono text-zinc-500 leading-relaxed pr-4 md:pr-12">
+              {respuesta}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
 
 export default function Home() {
-  // --- ESTADO Y LÓGICA PARA EL BOTÓN DE SCROLL ---
+  // ---------------------------------------------------
+  // ESTADOS GLOBALES
+  // ---------------------------------------------------
   const [mostrarBoton, setMostrarBoton] = useState(false);
+  const [estado, setEstado] = useState<'ideal' | 'enviando' | 'exito' | 'error'>('ideal');
 
   useEffect(() => {
-    const controlarScroll = () => {
-      if (window.scrollY > 300) {
-        setMostrarBoton(true);
-      } else {
-        setMostrarBoton(false);
-      }
-    };
-
+    const controlarScroll = () => setMostrarBoton(window.scrollY > 300);
     window.addEventListener("scroll", controlarScroll);
     return () => window.removeEventListener("scroll", controlarScroll);
   }, []);
 
-  // Lógica para evitar que los enlaces con "#" traben el botón "Atrás"
-  useEffect(() => {
-    const manejarEnlacesInternos = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const link = target.closest('a');
-      
-      if (!link) return;
-      const href = link.getAttribute('href');
-      if (!href || !href.startsWith('#') || href === '#') return;
-
-      e.preventDefault();
-      
-      const elementoDestino = document.querySelector(href);
-      if (elementoDestino) {
-        elementoDestino.scrollIntoView({ behavior: 'smooth' });
-        window.history.replaceState(null, '', href);
-      }
-    };
-
-    document.addEventListener('click', manejarEnlacesInternos);
-    return () => document.removeEventListener('click', manejarEnlacesInternos);
-  }, []);
-
-  const [estado, setEstado] = useState<'ideal' | 'enviando' | 'exito' | 'error'>('ideal');
-
   const manejarEnvio = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setEstado('enviando');
-
     const formData = new FormData(e.currentTarget);
     const datos = Object.fromEntries(formData.entries());
-
-    const res = await fetch('/api/send', {
-      method: 'POST',
-      body: JSON.stringify(datos),
-      headers: { 'Content-Type': 'application/json' },
-    });
-
+    const res = await fetch('/api/send', { method: 'POST', body: JSON.stringify(datos), headers: { 'Content-Type': 'application/json' } });
     if (res.ok) {
       setEstado('exito');
       (e.target as HTMLFormElement).reset();
-    } else {
-      setEstado('error');
-    }
+    } else setEstado('error');
   };
 
-  const volverArriba = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const volverArriba = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-  // Generamos un array de 400 elementos para la grilla del Hero
-  const gridItems = Array.from({ length: 400 });
+  // ---------------------------------------------------
+  // FÍSICAS DE SCROLL
+  // ---------------------------------------------------
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: heroProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const heroScale = useTransform(heroProgress, [0, 1], [1, 0.60]);
+  const heroOpacity = useTransform(heroProgress, [0, 0.5, 1], [1, 1, 0]);
+  const heroTextY = useTransform(heroProgress, [0, 1], ["0%", "80%"]);
+
+  const horizontalRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: horizontalProgress } = useScroll({ target: horizontalRef, offset: ["start start", "end end"] });
+  const smoothProgress = useSpring(horizontalProgress, { stiffness: 200, damping: 25, mass: 0.1 });
+  const x = useTransform(smoothProgress, [0, 1], ["calc(0% + 0vw)", "calc(-100% + 100vw)"]);
+  
+  const desarrolloRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: devProgress } = useScroll({ target: desarrolloRef, offset: ["start end", "end start"] });
+  const devImageY = useTransform(devProgress, [0, 1], ["-20%", "20%"]);
+
+  const mantenimientoRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: mantProgress } = useScroll({ target: mantenimientoRef, offset: ["start end", "end start"] });
+  const mantImageY = useTransform(mantProgress, [0, 1], ["-20%", "20%"]);
+
+  const optimizacionRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: optiProgress } = useScroll({ target: optimizacionRef, offset: ["start end", "end start"] });
+  const optiImageY = useTransform(optiProgress, [0, 1], ["-20%", "20%"]);
+
+  const cctvRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: cctvProgress } = useScroll({ target: cctvRef, offset: ["start end", "end start"] });
+  const cctvImageY = useTransform(cctvProgress, [0, 1], ["-20%", "20%"]);
 
   return (
-    <main className="min-h-screen bg-black">
-      {/* --- SEO --- */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "LocalBusiness",
-            "name": "Compufix",
-            "image": "https://www.compufix-sp.com.ar/logo-compufix.webp", 
-            "description": "Especialistas en mantenimiento y reparación de PC, optimización de hardware, instalación de cámaras de seguridad CCTV y desarrollo web a medida.",
-            "address": {
-              "@type": "PostalAddress",
-              "addressLocality": "Presidencia Roque Sáenz Peña",
-              "addressRegion": "Chaco",
-              "addressCountry": "AR"
-            },
-            "telephone": "+543644589416",
-            "url": "https://www.compufix-sp.com.ar", 
-            "founder": "Leandro David",
-            "foundingDate": "2016",
-            "priceRange": "$$"
-          })
-        }}
-      />
+    <main className="bg-black text-white min-h-screen selection:bg-white selection:text-black">
+      
+      {/* HEADER */}
+      <header className="fixed top-0 w-full z-50 p-6 md:px-12 flex justify-between items-center mix-blend-difference pointer-events-none">
+        <div className="font-black text-xl tracking-tighter uppercase pointer-events-auto">
+          Compufix.SP
+        </div>
+        <a href="#contacto" className="border border-white px-6 py-2 text-xs font-mono uppercase tracking-widest hover:bg-white hover:text-black transition-colors pointer-events-auto">
+          Contacto
+        </a>
+      </header>
 
-      {/* --- HEADER STICKY --- */}
-      <header className="sticky top-0 z-50 bg-black/90 backdrop-blur-sm border-b border-zinc-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            
-            {/* Logo */}
-            <div className="flex-shrink-0 flex items-center">
-              <a href="/" aria-label="Volver al inicio de Compufix" className="group">
-                <Image 
-                  src="/logo-compufix.webp" 
-                  alt="Logotipo de Compufix" 
-                  width={120} 
-                  height={35} 
-                  className="w-auto h-auto object-contain transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]"
-                />
-              </a>
+      {/* 1: HERO */}
+      <section ref={heroRef} className="relative h-[150vh] bg-black">
+        <motion.div 
+          style={{ scale: heroScale, opacity: heroOpacity }}
+          className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-[#050505] origin-top"
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:24px_24px] opacity-30"></div>
+
+          <motion.div style={{ y: heroTextY }} className="relative z-10 text-center px-4 flex flex-col items-center">
+            <div className="inline-flex items-center gap-4 px-4 py-2 border border-zinc-800 bg-black mb-8 shadow-[4px_4px_0px_#18181b]">
+              <span className="w-2 h-2 bg-white"></span>
+              <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">
+                Presidencia Roque Sáenz Peña, Chaco
+              </span>
             </div>
 
-            {/* Navegación */}
-            <div className="flex items-center gap-8">
-              <nav aria-label="Navegación principal" className="hidden md:flex items-center gap-6">
-                
-                {/* Menú desplegable */}
-                <div className="relative group py-5">
-                  <a href="#servicios" title="Ver todos los servicios" className="text-zinc-400 hover:text-white transition-colors text-sm font-medium flex items-center gap-1 cursor-pointer">
-                    Servicios
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:rotate-180 text-zinc-500">
-                      <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                  </a>
+            <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase leading-[0.85] mb-8">
+              Compufix <br />
+              <span className="text-zinc-600">Webdev & HW.</span>
+            </h1>
 
-                  {/* Submenú */}
-                  <div className="absolute top-full -left-4 w-56 bg-zinc-950 border border-zinc-800 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 flex flex-col py-2 translate-y-2 group-hover:translate-y-0 rounded-none shadow-2xl">
-                    <a href="#detalle-mantenimiento" className="px-4 py-2.5 text-sm text-zinc-400 hover:bg-zinc-900 hover:text-white transition-colors border-l-2 border-transparent hover:border-zinc-500">Mantenimiento de PC</a>
-                    <a href="#detalle-optimizacion" className="px-4 py-2.5 text-sm text-zinc-400 hover:bg-zinc-900 hover:text-white transition-colors border-l-2 border-transparent hover:border-zinc-500">Optimización de equipos</a>
-                    <a href="#detalle-cctv" className="px-4 py-2.5 text-sm text-zinc-400 hover:bg-zinc-900 hover:text-white transition-colors border-l-2 border-transparent hover:border-zinc-500">Cámaras de seguridad</a>
-                    <a href="#detalle-desarrollo" className="px-4 py-2.5 text-sm text-zinc-400 hover:bg-zinc-900 hover:text-white transition-colors border-l-2 border-transparent hover:border-zinc-500">Desarrollo web y sistemas</a>
+            <h2 className="text-lg md:text-xl font-mono text-zinc-400 mb-12 max-w-2xl mx-auto leading-relaxed font-normal">
+              Especialistas en <strong>reparación de PC, instalación de cámaras CCTV y desarrollo web</strong> de alto rendimiento. Soluciones técnicas integrales y sin fricciones.
+            </h2>
+            
+            <div className="animate-pulse">
+              <span className="text-xs font-mono text-zinc-600 uppercase tracking-widest border border-zinc-800 px-6 py-3 bg-black">
+                Explorar Servicios ↓
+              </span>
+            </div>
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* 2: SERVICIOS */}
+      <section ref={horizontalRef} className="relative h-[600vh] bg-[#050505] z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.8)] border-t border-zinc-900">
+        <div className="sticky top-0 h-screen flex flex-col justify-end md:justify-center pb-12 md:pb-0 overflow-hidden">
+          
+          <div className="absolute left-6 md:left-12 top-28 md:top-32 z-0 pointer-events-none">
+            <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest block mb-4">
+              // Catálogo de Servicios
+            </span>
+            <h2 className="text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter text-zinc-800 md:text-white/5 leading-[1.15] pt-2">
+              Nuestras <br className="hidden md:block" /> Soluciones.
+            </h2>
+          </div>
+
+          <motion.div style={{ x }} className="flex gap-6 md:gap-12 pl-[7.5vw] md:pl-[30vw] items-center relative z-10 w-fit">
+            {[
+              { num: "01", titulo: "Desarrollo Web", desc: "Sistemas a medida, landing pages de alta conversión y plataformas robustas creadas con las últimas tecnologías.", link: "#detalle-desarrollo" },
+              { num: "02", titulo: "Mantenimiento PC", desc: "Diagnóstico, limpieza física profunda y solución a fallas de hardware para garantizar rendimiento y vida útil.", link: "#detalle-mantenimiento" },
+              { num: "03", titulo: "Hardware Upgrade", desc: "Ampliación de RAM, clonación a discos sólidos (SSD) y asesoramiento técnico especializado para revivir equipos.", link: "#detalle-optimizacion" },
+              { num: "04", titulo: "Seguridad CCTV", desc: "Sistemas de videovigilancia. Cámaras HD, DVRs y configuración en Chaco para acceso remoto desde dispositivos móviles.", link: "#detalle-cctv" }
+            ].map((servicio, i) => (
+              <motion.article 
+                key={i}
+                initial={{ opacity: 0.1, scale: 0.85 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ margin: "0px -15% 0px -15%", amount: "some" }} 
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="w-[85vw] md:w-[40vw] h-[55vh] md:h-[60vh] shrink-0 bg-[#0A0A0A] flex flex-col relative group overflow-hidden shadow-2xl border-none"
+              >
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#18181b_1px,transparent_1px),linear-gradient(to_bottom,#18181b_1px,transparent_1px)] bg-[size:2rem_2rem] opacity-20 pointer-events-none"></div>
+                
+                <div className="w-full h-full p-8 md:p-14 flex flex-col justify-center relative z-10 bg-[#0A0A0A]">
+                  <span className="text-6xl md:text-8xl font-black text-zinc-900 mb-6 font-mono leading-none">{servicio.num}</span>
+                  <h3 className="text-3xl md:text-5xl font-bold text-white mb-6 uppercase tracking-widest">{servicio.titulo}</h3>
+                  <p className="text-lg font-mono text-zinc-400 leading-relaxed mb-12">{servicio.desc}</p>
+                  <a href={servicio.link} aria-label={`Ver detalles sobre ${servicio.titulo}`} className="text-sm font-mono text-white uppercase tracking-widest underline decoration-zinc-600 underline-offset-8 hover:decoration-white transition-colors w-fit mt-auto pointer-events-auto">
+                    Ver detalles →
+                  </a>
+                </div>
+              </motion.article>
+            ))}
+            <div className="w-[7.5vw] md:w-[30vw] shrink-0 pointer-events-none"></div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 3: SOBRE NOSOTROS */}
+      <section id="sobre-nosotros" className="relative bg-[#050505] py-32 border-t border-zinc-900 z-30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-8 items-start">
+            
+            <div className="lg:col-span-5 lg:sticky lg:top-40 flex flex-col justify-center items-center lg:items-start">
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                className="relative w-full max-w-[280px] aspect-square flex items-center justify-center"
+              >
+                <div className="absolute inset-0 bg-white/5 rounded-full blur-[100px] pointer-events-none"></div>
+                <motion.div
+                  animate={{ y: [-15, 15, -15] }}
+                  transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+                  className="relative w-full h-full"
+                >
+                  <Image 
+                    src="/logo-compufix.webp" 
+                    alt="Logotipo de Compufix SP, especialistas en tecnología" 
+                    fill 
+                    className="object-contain opacity-90 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]"
+                  />
+                </motion.div>
+              </motion.div>
+            </div>
+
+            <div className="lg:col-span-7 flex flex-col gap-10 lg:pt-12">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.6 }}
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="w-2 h-2 bg-white"></span>
+                  <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Leandro David</span>
+                </div>
+                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-none">
+                  El motor detrás <br /> de Compufix.
+                </h2>
+              </motion.div>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="text-lg font-mono text-zinc-400 leading-relaxed"
+              >
+                Soy técnico especialista, radicado en <strong>Presidencia Roque Sáenz Peña, Chaco</strong>. Mi enfoque combina la precisión del hardware con la escalabilidad del software para ofrecer soluciones IT integrales y sin vueltas.
+              </motion.p>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-lg font-mono text-zinc-400 leading-relaxed"
+              >
+                Este proyecto arrancó en 2016 desde un pequeño taller local. El objetivo siempre fue claro: darle una segunda vida a los equipos informáticos mediante mantenimientos rigurosos, y construir <strong>sistemas y landing pages de alto impacto</strong> para negocios locales y remotos.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="grid grid-cols-2 gap-6 pt-8 border-t border-zinc-900 mt-4"
+              >
+                <div>
+                  <h4 className="text-4xl font-black text-white mb-2 font-mono">2016</h4>
+                  <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Año de inicio</p>
+                </div>
+                <div>
+                  <h4 className="text-4xl font-black text-white mb-2 font-mono">100%</h4>
+                  <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Compromiso técnico</p>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4: DETALLE DESARROLLO */}
+      <section id="detalle-desarrollo" ref={desarrolloRef} className="relative bg-[#050505] py-32 border-t border-zinc-900 z-30 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+            
+            <div className="flex flex-col justify-center order-2 lg:order-1">
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="w-2 h-2 bg-white"></span>
+                  <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Servicio 01</span>
+                </div>
+                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-[1.1] mb-8">
+                  Desarrollo web <br /> a medida.
+                </h2>
+              </motion.div>
+
+              <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.1 }} className="text-lg font-mono text-zinc-400 leading-relaxed mb-8">
+                Diseñamos y desarrollamos soluciones digitales preparadas para escalar. Creación de <strong>landing pages optimizadas para SEO local</strong> y aplicaciones web full-stack de alto rendimiento.
+              </motion.p>
+
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.2 }} className="border-t border-zinc-900 pt-8 mt-4">
+                <h3 className="text-xs font-mono text-zinc-600 uppercase tracking-widest mb-6">Stack Tecnológico</h3>
+                <ul className="grid grid-cols-2 gap-4">
+                  <li className="flex items-center gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> React & Next.js</li>
+                  <li className="flex items-center gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Control Git / GitHub</li>
+                  <li className="flex items-center gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Deploy en Vercel</li>
+                  <li className="flex items-center gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> WordPress Avanzado</li>
+                </ul>
+              </motion.div>
+
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-12">
+                <a href="#contacto" aria-label="Iniciar proyecto de Desarrollo Web" className="inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-8 py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-white transition-colors">
+                  Iniciar Desarrollo
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+              </motion.div>
+            </div>
+
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[4/5] md:aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group">
+              <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
+              <motion.div style={{ y: devImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
+                <Image src="/desarrollo-nuevo.webp" alt="Programación y Diseño de Sistemas Web a Medida" fill className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
+              </motion.div>
+            </motion.div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 5: DETALLE MANTENIMIENTO */}
+      <section id="detalle-mantenimiento" ref={mantenimientoRef} className="relative bg-[#050505] py-32 border-t border-zinc-900 z-30 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+            
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[4/5] md:aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group">
+              <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
+              <motion.div style={{ y: mantImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
+                <Image src="/img-reparacion.webp" alt="Servicio Técnico, Mantenimiento y Reparación de PC en Chaco" fill className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
+              </motion.div>
+            </motion.div>
+
+            <div className="flex flex-col justify-center order-2">
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="w-2 h-2 bg-white"></span>
+                  <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Servicio 02</span>
+                </div>
+                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-[1.1] mb-8">
+                  Mantenimiento <br /> de Hardware.
+                </h2>
+              </motion.div>
+
+              <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.1 }} className="text-lg font-mono text-zinc-400 leading-relaxed mb-8">
+                Un equipo lento o con sobrecalentamiento reduce tu productividad. Brindamos <strong>servicio técnico de PC especializado</strong> para asegurar estabilidad, velocidad y rendimiento continuo.
+              </motion.p>
+
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.2 }} className="border-t border-zinc-900 pt-8 mt-4">
+                <h3 className="text-xs font-mono text-zinc-600 uppercase tracking-widest mb-6">Procedimientos Clave</h3>
+                <ul className="flex flex-col gap-4">
+                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span><strong>Diagnóstico preciso</strong>, limpieza física integral y recambio de pasta térmica.</span></li>
+                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Limpieza profunda de virus, malware y optimización del sistema operativo.</span></li>
+                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Reinstalación de sistemas (Windows/Linux) con <strong>backup preventivo estricto</strong>.</span></li>
+                </ul>
+              </motion.div>
+
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-12">
+                <a href="#contacto" aria-label="Solicitar Diagnóstico de PC" className="inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-8 py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-white transition-colors">
+                  Solicitar Diagnóstico
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+              </motion.div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 6: DETALLE OPTIMIZACIÓN */}
+      <section id="detalle-optimizacion" ref={optimizacionRef} className="relative bg-[#050505] py-32 border-t border-zinc-900 z-30 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+            
+            <div className="flex flex-col justify-center order-2 lg:order-1">
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="w-2 h-2 bg-white"></span>
+                  <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Servicio 03</span>
+                </div>
+                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-[1.1] mb-8">
+                  Optimización <br /> y Upgrades.
+                </h2>
+              </motion.div>
+
+              <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.1 }} className="text-lg font-mono text-zinc-400 leading-relaxed mb-8">
+                Evitá comprar una computadora nueva. Mediante la <strong>ampliación de memoria RAM y clonación a SSD</strong>, le damos una segunda vida a tu infraestructura, multiplicando su velocidad drásticamente.
+              </motion.p>
+
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.2 }} className="border-t border-zinc-900 pt-8 mt-4">
+                <h3 className="text-xs font-mono text-zinc-600 uppercase tracking-widest mb-6">Mejoras Aplicadas</h3>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Migración a Discos Sólidos (SSD).</li>
+                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Ampliación de Memoria RAM.</li>
+                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Clonación de discos sin pérdida.</li>
+                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Asesoramiento para armado PC Gamer.</li>
+                </ul>
+              </motion.div>
+
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-12">
+                <a href="#contacto" aria-label="Cotizar Hardware Upgrade" className="inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-8 py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-white transition-colors">
+                  Cotizar Upgrade
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+              </motion.div>
+            </div>
+
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[4/5] md:aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group">
+              <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
+              <motion.div style={{ y: optiImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
+                <Image src="/img-opti.webp" alt="Hardware Upgrade, ampliación SSD y memoria RAM" fill className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
+              </motion.div>
+            </motion.div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 7: DETALLE CCTV */}
+      <section id="detalle-cctv" ref={cctvRef} className="relative bg-[#050505] py-32 border-t border-zinc-900 z-30 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+            
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[4/5] md:aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group">
+              <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
+              <motion.div style={{ y: cctvImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
+                <Image src="/img-camaras.webp" alt="Instalación de Cámaras de Seguridad CCTV y Videovigilancia" fill className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
+              </motion.div>
+            </motion.div>
+
+            <div className="flex flex-col justify-center order-2">
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="w-2 h-2 bg-white"></span>
+                  <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Servicio 04</span>
+                </div>
+                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-[1.1] mb-8">
+                  Seguridad <br /> CCTV 24/7.
+                </h2>
+              </motion.div>
+
+              <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.1 }} className="text-lg font-mono text-zinc-400 leading-relaxed mb-8">
+                Protegé tu hogar o espacio de trabajo. Realizamos <strong>instalación de cámaras de seguridad y sistemas de videovigilancia CCTV</strong> de alta definición con diseño de cobertura estratégica.
+              </motion.p>
+
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.2 }} className="border-t border-zinc-900 pt-8 mt-4">
+                <h3 className="text-xs font-mono text-zinc-600 uppercase tracking-widest mb-6">Infraestructura</h3>
+                <ul className="flex flex-col gap-4">
+                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Instalación de cámaras HD y configuración completa de DVRs.</span></li>
+                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Monitoreo remoto en tiempo real desde smartphone o PC.</span></li>
+                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Revisión e implementación técnica de cableado estructurado.</span></li>
+                </ul>
+              </motion.div>
+
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-12">
+                <a href="#contacto" aria-label="Presupuestar proyecto CCTV" className="inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-8 py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-white transition-colors">
+                  Presupuestar Proyecto
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+              </motion.div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 8: PROCESO */}
+      <section id="proceso" className="relative bg-[#050505] py-32 border-t border-zinc-900 z-30">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }} className="text-center mb-24">
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <span className="w-2 h-2 bg-white"></span>
+              <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Metodología</span>
+            </div>
+            <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-none mb-6">
+              Transparencia <br /> paso a paso.
+            </h2>
+            <p className="text-lg font-mono text-zinc-400 max-w-xl mx-auto leading-relaxed">
+              Sabemos que la falta de información genera dudas. Por eso, diseñamos un proceso donde vos sos parte del circuito en todo momento.
+            </p>
+          </motion.div>
+
+          <div className="relative flex flex-col gap-24 pb-24">
+            <motion.article initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ margin: "-100px" }} transition={{ duration: 0.5 }} className="sticky top-[15vh] w-full border border-zinc-800 bg-[#0A0A0A] p-8 md:p-12 shadow-2xl flex flex-col md:flex-row gap-8 items-start md:items-center">
+              <div className="md:w-1/3 flex flex-col">
+                <span className="text-7xl font-black text-zinc-800 font-mono leading-none mb-4">01</span>
+                <h3 className="text-2xl font-bold text-white uppercase tracking-widest">Diagnóstico</h3>
+              </div>
+              <div className="md:w-2/3">
+                <p className="text-base font-mono text-zinc-400 leading-relaxed">
+                  Evaluamos tu equipo o requerimientos web. <strong className="text-white font-normal">Estamos en contacto directo con vos</strong>, hablándote claro y sin tecnicismos innecesarios.
+                </p>
+              </div>
+            </motion.article>
+
+            <motion.article initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ margin: "-100px" }} transition={{ duration: 0.5 }} className="sticky top-[18vh] w-full border border-zinc-800 bg-[#0A0A0A] p-8 md:p-12 shadow-2xl flex flex-col md:flex-row gap-8 items-start md:items-center">
+              <div className="md:w-1/3 flex flex-col">
+                <span className="text-7xl font-black text-zinc-800 font-mono leading-none mb-4">02</span>
+                <h3 className="text-2xl font-bold text-white uppercase tracking-widest">Propuesta</h3>
+              </div>
+              <div className="md:w-2/3">
+                <p className="text-base font-mono text-zinc-400 leading-relaxed">
+                  Armamos un plan de acción detallado. <strong className="text-white font-normal">Repasamos juntos cada ítem por WhatsApp o email</strong> y no avanzamos hasta que estés 100% de acuerdo.
+                </p>
+              </div>
+            </motion.article>
+
+            <motion.article initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ margin: "-100px" }} transition={{ duration: 0.5 }} className="sticky top-[21vh] w-full border border-zinc-800 bg-[#0A0A0A] p-8 md:p-12 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] flex flex-col md:flex-row gap-8 items-start md:items-center">
+              <div className="md:w-1/3 flex flex-col">
+                <span className="text-7xl font-black text-[#E1F030] font-mono leading-none mb-4">03</span>
+                <h3 className="text-2xl font-bold text-white uppercase tracking-widest">Ejecución</h3>
+              </div>
+              <div className="md:w-2/3">
+                <p className="text-base font-mono text-zinc-400 leading-relaxed">
+                  Ponemos manos a la obra. Ya sea reparando un servidor o programando una web, <strong className="text-white font-normal">te mandamos actualizaciones del avance de tu proyecto</strong>.
+                </p>
+              </div>
+            </motion.article>
+          </div>
+        </div>
+      </section>
+
+      {/* 9: REDES SOCIALES */}
+      <section id="sociales" className="relative bg-[#050505] py-32 border-t border-zinc-900 z-30 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }} className="mb-16 md:mb-24">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="w-2 h-2 bg-white"></span>
+              <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Comunidad</span>
+            </div>
+            <h2 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-tighter text-white leading-none">
+              Presencia <br className="hidden md:block" /> Digital.
+            </h2>
+          </motion.div>
+
+          <nav aria-label="Enlaces a Redes Sociales" className="flex flex-col border-t border-zinc-900">
+            
+            <motion.a href="https://www.instagram.com/compufix.sp" aria-label="Visitar el Instagram de Compufix" target="_blank" rel="noopener noreferrer" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.5 }} className="group flex items-center justify-between py-10 md:py-16 border-b border-zinc-900 hover:border-zinc-700 transition-colors">
+              <div className="flex items-center gap-6 md:gap-12">
+                <span className="text-xl md:text-2xl font-mono font-black text-zinc-800 group-hover:text-zinc-500 transition-colors">IG</span>
+                <span className="text-3xl md:text-6xl lg:text-7xl font-black uppercase tracking-tighter text-zinc-500 group-hover:text-white transition-colors duration-500">Instagram</span>
+              </div>
+              <div className="flex items-center gap-6">
+                <span className="hidden md:block text-xs font-mono text-zinc-600 uppercase tracking-widest group-hover:text-zinc-400 transition-colors">@compufix.sp</span>
+                <div className="w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center group-hover:bg-white group-hover:border-white transition-all duration-500">
+                  <svg className="w-5 h-5 text-zinc-500 group-hover:text-black transform group-hover:rotate-[-45deg] transition-all duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </div>
+              </div>
+            </motion.a>
+
+            <motion.a href="https://www.facebook.com/compufix.sp" aria-label="Visitar el Facebook de Compufix" target="_blank" rel="noopener noreferrer" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.5, delay: 0.1 }} className="group flex items-center justify-between py-10 md:py-16 border-b border-zinc-900 hover:border-zinc-700 transition-colors">
+              <div className="flex items-center gap-6 md:gap-12">
+                <span className="text-xl md:text-2xl font-mono font-black text-zinc-800 group-hover:text-zinc-500 transition-colors">FB</span>
+                <span className="text-3xl md:text-6xl lg:text-7xl font-black uppercase tracking-tighter text-zinc-500 group-hover:text-[#1877F2] transition-colors duration-500">Facebook</span>
+              </div>
+              <div className="flex items-center gap-6">
+                <span className="hidden md:block text-xs font-mono text-zinc-600 uppercase tracking-widest group-hover:text-zinc-400 transition-colors">/compufix.sp</span>
+                <div className="w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center group-hover:bg-[#1877F2] group-hover:border-[#1877F2] transition-all duration-500">
+                  <svg className="w-5 h-5 text-zinc-500 group-hover:text-white transform group-hover:rotate-[-45deg] transition-all duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </div>
+              </div>
+            </motion.a>
+
+            <motion.a href="https://wa.me/543644589416?text=Hola%20Compufix!%20Me%20contacto%20desde%20su%20página%20web%20para%20hacer%20una%20consulta." aria-label="Enviar mensaje de WhatsApp a Soporte Técnico" target="_blank" rel="noopener noreferrer" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.5, delay: 0.2 }} className="group flex items-center justify-between py-10 md:py-16 border-b border-zinc-900 hover:border-zinc-700 transition-colors">
+              <div className="flex items-center gap-6 md:gap-12">
+                <span className="text-xl md:text-2xl font-mono font-black text-zinc-800 group-hover:text-zinc-500 transition-colors">WA</span>
+                <span className="text-3xl md:text-6xl lg:text-7xl font-black uppercase tracking-tighter text-zinc-500 group-hover:text-[#25D366] transition-colors duration-500">WhatsApp</span>
+              </div>
+              <div className="flex items-center gap-6">
+                <span className="hidden md:block text-xs font-mono text-zinc-600 uppercase tracking-widest group-hover:text-zinc-400 transition-colors">Chatear ahora</span>
+                <div className="w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center group-hover:bg-[#25D366] group-hover:border-[#25D366] transition-all duration-500">
+                  <svg className="w-5 h-5 text-zinc-500 group-hover:text-black transform group-hover:rotate-[-45deg] transition-all duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </div>
+              </div>
+            </motion.a>
+
+          </nav>
+        </div>
+      </section>
+
+      {/* 10: FAQ */}
+      <section id="faq" className="relative bg-[#050505] py-32 border-t border-zinc-900 z-30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-8 items-start">
+            
+            <div className="lg:col-span-4 lg:sticky lg:top-40">
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="w-2 h-2 bg-white"></span>
+                  <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Dudas Comunes</span>
+                </div>
+                <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter text-white leading-none mb-6">
+                  FAQ.
+                </h2>
+                <p className="text-sm font-mono text-zinc-400 leading-relaxed max-w-xs">
+                  Respuestas rápidas sobre soporte técnico, desarrollo web y garantías en Chaco y alrededores.
+                </p>
+              </motion.div>
+            </div>
+
+            <div className="lg:col-span-8 flex flex-col border-t border-zinc-900">
+              <FaqItem pregunta="¿Tienen garantía los mantenimientos de PC?" respuesta="Absolutamente. Todos nuestros trabajos de reparación de hardware, limpieza física y actualizaciones SSD/RAM cuentan con garantía escrita." />
+              <FaqItem pregunta="¿El servicio de desarrollo web aplica fuera del Chaco?" respuesta="Sí, el área de Sistemas Web funciona 100% online. Desarrollamos páginas para clientes de todo Argentina mediante metodologías ágiles a distancia." />
+              <FaqItem pregunta="¿Qué necesito para cotizar la instalación de cámaras CCTV?" respuesta="Basta con comunicarte al WhatsApp. Evaluamos la cobertura necesaria de tu domicilio o negocio y preparamos un presupuesto de videovigilancia a medida." />
+              <FaqItem pregunta="¿Venden equipos informáticos nuevos?" respuesta="Nos centramos en la reparación de PC, optimización y montaje técnico de equipos armados bajo pedido, ya sea para oficina, diseño gráfico o gaming." />
+              <FaqItem pregunta="¿Cómo es el sistema de pagos?" respuesta="El servicio técnico físico se abona al finalizar exitosamente. Para diseño web, trabajamos con un anticipo del 50%. Aceptamos efectivo, transferencias y billeteras virtuales." />
+            </div>
+            
+          </div>
+        </div>
+      </section>
+
+      {/* 11: CONTACTO / FORMULARIO */}
+      <section id="contacto" className="relative bg-[#050505] py-32 border-t border-zinc-900 z-30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
+            
+            <div className="flex flex-col justify-center">
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="w-2 h-2 bg-white"></span>
+                  <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Iniciá tu consulta</span>
+                </div>
+                <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter text-white leading-none mb-8">
+                  Hablemos.
+                </h2>
+                <p className="text-lg font-mono text-zinc-400 leading-relaxed mb-12">
+                  ¿Buscás optimizar tu PC, instalar cámaras de seguridad o crear una página web? Escribinos y transformemos esa idea en realidad.
+                </p>
+
+                <address className="flex flex-col gap-6 pt-8 border-t border-zinc-900 not-italic">
+                  <div className="flex items-start gap-4">
+                    <div>
+                      <h4 className="text-sm font-bold text-white uppercase tracking-widest mb-1">Ubicación</h4>
+                      <p className="text-sm font-mono text-zinc-400">Presidencia Roque Sáenz Peña, Chaco.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div>
+                      <h4 className="text-sm font-bold text-white uppercase tracking-widest mb-1">Horarios de Atención</h4>
+                      <p className="text-sm font-mono text-zinc-400">Lunes a Viernes: 7:00 a 15:00 h.</p>
+                    </div>
+                  </div>
+                </address>
+              </motion.div>
+            </div>
+
+            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.2 }}>
+              <form onSubmit={manejarEnvio} className="flex flex-col gap-8 p-8 md:p-12 bg-[#0A0A0A] border border-zinc-900 shadow-2xl">
+                
+                <div className="relative group">
+                  <label htmlFor="nombre" className="sr-only">Tu Nombre</label>
+                  <input id="nombre" type="text" name="nombre" required placeholder="Tu nombre" className="w-full bg-transparent border-b border-zinc-800 py-4 text-white font-mono text-sm placeholder-zinc-600 focus:outline-none focus:border-white transition-colors" />
+                </div>
+
+                <div className="relative group">
+                  <label htmlFor="email" className="sr-only">Tu Email</label>
+                  <input id="email" type="email" name="email" required placeholder="Email" className="w-full bg-transparent border-b border-zinc-800 py-4 text-white font-mono text-sm placeholder-zinc-600 focus:outline-none focus:border-white transition-colors" />
+                </div>
+
+                <div className="relative group">
+                  <label htmlFor="servicio" className="sr-only">Seleccionar Servicio</label>
+                  <select id="servicio" name="servicio" required defaultValue="" className="w-full bg-transparent border-b border-zinc-800 py-4 text-zinc-400 font-mono text-sm focus:outline-none focus:border-white transition-colors appearance-none cursor-pointer">
+                    <option value="" disabled hidden>Seleccioná un servicio...</option>
+                    <option value="desarrollo" className="bg-[#0A0A0A] text-white">Desarrollo Web / Páginas</option>
+                    <option value="mantenimiento" className="bg-[#0A0A0A] text-white">Reparación de PC</option>
+                    <option value="upgrade" className="bg-[#0A0A0A] text-white">Hardware y Upgrades</option>
+                    <option value="cctv" className="bg-[#0A0A0A] text-white">Cámaras de Seguridad CCTV</option>
+                    <option value="otro" className="bg-[#0A0A0A] text-white">Otras consultas</option>
+                  </select>
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg className="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                   </div>
                 </div>
 
-                <a href="#sobre-nosotros" className="text-zinc-400 hover:text-white transition-colors text-sm font-medium">Sobre nosotros</a>
-                <a href="#proceso" className="text-zinc-400 hover:text-white transition-colors text-sm font-medium">Cómo trabajamos</a>
-                <a href="#faq" className="text-zinc-400 hover:text-white transition-colors text-sm font-medium">Preguntas frecuentes</a>
-                <a href="#sociales" className="text-zinc-400 hover:text-white transition-colors text-sm font-medium">Redes</a>
-              </nav>
+                <div className="relative group">
+                  <label htmlFor="mensaje" className="sr-only">Mensaje</label>
+                  <textarea id="mensaje" name="mensaje" required rows={4} placeholder="Contame los detalles de tu problema o proyecto..." className="w-full bg-transparent border-b border-zinc-800 py-4 text-white font-mono text-sm placeholder-zinc-600 focus:outline-none focus:border-white transition-colors resize-none"></textarea>
+                </div>
 
-              {/* Botón Contacto Header */}
-              <a 
-                href="#contacto" 
-                className="bg-white text-black px-4 py-2 text-xs font-mono font-bold uppercase tracking-widest hover:bg-zinc-200 transition-colors"
-              >
-                Contacto
+                <button 
+                  type="submit" 
+                  disabled={estado === 'enviando' || estado === 'exito'}
+                  className={`mt-4 w-full border px-8 py-5 text-sm font-mono uppercase tracking-widest transition-all duration-300 flex justify-center items-center gap-4
+                    ${estado === 'ideal' ? 'border-zinc-800 text-white hover:bg-white hover:text-black' : ''}
+                    ${estado === 'enviando' ? 'border-zinc-600 text-zinc-400 cursor-wait bg-zinc-900' : ''}
+                    ${estado === 'exito' ? 'border-green-900 text-green-400 bg-green-950/30' : ''}
+                    ${estado === 'error' ? 'border-red-900 text-red-400 bg-red-950/30 hover:bg-red-900 hover:text-white' : ''}
+                  `}
+                >
+                  {estado === 'ideal' && <>Enviar Consulta <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></>}
+                  {estado === 'enviando' && 'Procesando...'}
+                  {estado === 'exito' && '✓ Recibido correctamente'}
+                  {estado === 'error' && 'Error al enviar'}
+                </button>
+                
+              </form>
+            </motion.div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 12: FOOTER */}
+      <footer className="relative bg-black pt-24 pb-8 border-t border-zinc-900 z-30 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-20">
+            <div className="flex flex-col">
+              <span className="text-2xl font-black uppercase tracking-tighter text-white mb-4">Compufix.SP</span>
+              <p className="text-sm font-mono text-zinc-500 max-w-xs leading-relaxed">
+                Arquitectura de hardware, sistemas CCTV y desarrollo web. Elevando el estándar técnico en la provincia.
+              </p>
+            </div>
+
+            <nav aria-label="Navegación del sitio web" className="flex flex-col gap-3">
+              <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-2">Navegación</h4>
+              <button onClick={volverArriba} className="text-left text-sm font-mono text-zinc-500 hover:text-white transition-colors w-fit">Inicio</button>
+              <a href="#proceso" className="text-sm font-mono text-zinc-500 hover:text-white transition-colors w-fit">Metodología</a>
+              <a href="#faq" className="text-sm font-mono text-zinc-500 hover:text-white transition-colors w-fit">Soporte y Dudas</a>
+              <a href="#contacto" className="text-sm font-mono text-zinc-500 hover:text-white transition-colors w-fit">Contacto Rápido</a>
+            </nav>
+
+            <div className="flex flex-col gap-3">
+              <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-2">Legal & Políticas</h4>
+              <a href="mailto:contacto@compufix.com.ar" className="text-sm font-mono text-zinc-500 hover:text-white transition-colors w-fit">
+                contacto@compufix.com.ar
+              </a>
+              <a href="/politica-de-privacidad" className="text-sm font-mono text-zinc-500 hover:text-white transition-colors w-fit">
+                Política de Privacidad
+              </a>
+              <a href="/politica-de-cookies" className="text-sm font-mono text-zinc-500 hover:text-white transition-colors w-fit">
+                Política de Cookies
               </a>
             </div>
           </div>
-        </div>
-      </header>
 
-      {/* --- SECCIÓN HERO INTERACTIVO (SWISS GRID / EDITORIAL TÉCNICO) --- */}
-      <section className="relative w-full min-h-screen flex flex-col bg-black border-b border-zinc-900 pt-16">
-        
-        {/* Contenedor Principal dividido en Grilla Exacta */}
-        <div className="flex-1 flex flex-col md:flex-row w-full max-w-[1400px] mx-auto border-x border-zinc-900">
-          
-          {/* Columna Izquierda: Titular y Copy */}
-          <div className="w-full md:w-2/3 border-b md:border-b-0 md:border-r border-zinc-900 p-8 md:p-16 flex flex-col justify-center relative">
-            
-            {/* Patrón de puntos técnico en el fondo de esta celda */}
-            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
-            
-            <div className="relative z-10">
-              <div className="inline-flex items-center gap-4 px-4 py-2 border border-zinc-800 bg-zinc-950 mb-12">
-                <span className="w-2 h-2 bg-[#E1F030] animate-pulse"></span>
-                <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">
-                  STATUS: ONLINE
-                </span>
-              </div>
-
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white uppercase leading-[0.9] mb-8">
-                COMPUFIX.SP <br />
-                <span className="text-zinc-600">desarrollo &</span> <br />
-                INFRAESTRUCTURA.
-              </h1>
-              
-              <p className="text-lg font-mono text-zinc-400 mb-12 max-w-xl leading-relaxed">
-                Desarrollo web full-stack de alto rendimiento e infraestructura técnica especializada. Soluciones precisas, sin vueltas.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-0 border border-zinc-800 w-fit">
-                <a 
-                  href="#contacto"
-                  className="bg-white text-black px-8 py-4 font-mono font-bold text-sm uppercase tracking-widest hover:bg-[#E1F030] transition-colors text-center"
-                >
-                  Iniciar Proyecto
-                </a>
-                <a 
-                  href="#servicios"
-                  className="bg-black text-white px-8 py-4 font-mono font-bold text-sm uppercase tracking-widest hover:bg-zinc-900 transition-colors text-center border-t sm:border-t-0 sm:border-l border-zinc-800"
-                >
-                  Ver Servicios
-                </a>
-              </div>
-            </div>
-          </div>
-
-          {/* Columna Derecha: Stack y Datos (Dividida en 2 filas) */}
-          <div className="w-full md:w-1/3 flex flex-col">
-            
-            {/* Celda Superior: Stack Técnico */}
-            <div className="flex-1 border-b border-zinc-900 p-8 flex flex-col justify-center bg-zinc-950/30 hover:bg-zinc-900/50 transition-colors">
-              <h3 className="text-white font-mono font-bold text-xs uppercase tracking-widest mb-6">
-                // Software Stack
-              </h3>
-              <ul className="space-y-4 font-mono text-sm text-zinc-500">
-                <li className="flex justify-between border-b border-zinc-900 pb-2">
-                  <span className="text-zinc-300">Framework</span>
-                  <span>Next.js / React</span>
-                </li>
-                <li className="flex justify-between border-b border-zinc-900 pb-2">
-                  <span className="text-zinc-300">CMS</span>
-                  <span>WordPress Avanzado</span>
-                </li>
-                <li className="flex justify-between border-b border-zinc-900 pb-2">
-                  <span className="text-zinc-300">Deploy</span>
-                  <span>Vercel / Git</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Celda Inferior: Infraestructura */}
-            <div className="flex-1 p-8 flex flex-col justify-center bg-zinc-950/30 hover:bg-zinc-900/50 transition-colors">
-              <h3 className="text-[#E1F030] font-mono font-bold text-xs uppercase tracking-widest mb-6">
-                [ Hardware & Redes ]
-              </h3>
-              <ul className="space-y-4 font-mono text-sm text-zinc-500">
-                <li className="flex justify-between border-b border-zinc-900 pb-2">
-                  <span className="text-zinc-300">Equipos</span>
-                  <span>Mantenimiento & Refurbish</span>
-                </li>
-                <li className="flex justify-between border-b border-zinc-900 pb-2">
-                  <span className="text-zinc-300">Seguridad</span>
-                  <span>Instalación CCTV</span>
-                </li>
-                <li className="flex justify-between border-b border-zinc-900 pb-2">
-                  <span className="text-zinc-300">Redes</span>
-                  <span>Cableado Estructurado</span>
-                </li>
-              </ul>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* --- SECCIÓN NUESTROS SERVICIOS (GLASSMORPHISM ABSTRACTO) --- */}
-      <section id="servicios" className="py-24 relative overflow-hidden border-b border-zinc-900">
-        <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}></div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="mb-20"
-          > 
-            <span className="text-zinc-500 font-mono text-sm tracking-widest uppercase mb-2 block">
-              // Nuestras soluciones
-            </span>
-            <h2 className="text-4xl md:text-6xl font-black tracking-tight text-white">
-              Servicios
-            </h2>
-            <div className="w-full h-[1px] bg-zinc-800 mt-8"></div>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-            
-            {/* Tarjeta 4 */}
-            <motion.article 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="group relative bg-zinc-950/40 backdrop-blur-md border border-zinc-800 p-8 md:p-12 min-h-[340px] flex flex-col justify-between overflow-hidden transition-colors duration-500 hover:border-zinc-600"
-            >
-              <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-white/5 rounded-full blur-[80px] group-hover:bg-white/10 group-hover:scale-110 transition-all duration-700 ease-out pointer-events-none"></div>
-              <div className="relative z-10">
-                <span className="text-zinc-700 font-mono text-2xl font-bold tracking-tighter mb-6 block group-hover:text-zinc-500 transition-colors">01 /</span>
-                <h3 className="text-2xl md:text-3xl font-black text-white mb-4 tracking-tight">Desarrollo Web</h3>
-                <p className="text-zinc-400 leading-relaxed max-w-sm">
-                  Llevamos tu negocio al mundo digital. Construimos desde landing pages efectivas hasta sistemas de gestión web a medida.
-                </p>
-              </div>
-              <div className="relative z-10 mt-10">
-                <a href="#detalle-desarrollo" className="inline-flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-white group-hover:text-zinc-300 transition-colors">
-                  Explorar
-                  <svg className="w-5 h-5 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                </a>
-              </div>
-            </motion.article>
-            
-            {/* Tarjeta 1 */}
-            <motion.article 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5 }}
-              className="group relative bg-zinc-950/40 backdrop-blur-md border border-zinc-800 p-8 md:p-12 min-h-[340px] flex flex-col justify-between overflow-hidden transition-colors duration-500 hover:border-zinc-600"
-            >
-              <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-[#E1F030]/5 rounded-full blur-[80px] group-hover:bg-[#E1F030]/15 group-hover:scale-110 transition-all duration-700 ease-out pointer-events-none"></div>
-              <div className="relative z-10">
-                <span className="text-zinc-700 font-mono text-2xl font-bold tracking-tighter mb-6 block group-hover:text-zinc-500 transition-colors">02 /</span>
-                <h3 className="text-2xl md:text-3xl font-black text-white mb-4 tracking-tight">Mantenimiento de PC</h3>
-                <p className="text-zinc-400 leading-relaxed max-w-sm">
-                  Diagnóstico preciso, limpieza física profunda y solución a fallas de hardware para que tu equipo vuelva a funcionar como el primer día.
-                </p>
-              </div>
-              <div className="relative z-10 mt-10">
-                <a href="#detalle-mantenimiento" className="inline-flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-white group-hover:text-[#E1F030] transition-colors">
-                  Explorar
-                  <svg className="w-5 h-5 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                </a>
-              </div>
-            </motion.article>
-
-            {/* Tarjeta 2 */}
-            <motion.article 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="group relative bg-zinc-950/40 backdrop-blur-md border border-zinc-800 p-8 md:p-12 min-h-[340px] flex flex-col justify-between overflow-hidden transition-colors duration-500 hover:border-zinc-600"
-            >
-              <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-blue-500/5 rounded-full blur-[80px] group-hover:bg-blue-500/15 group-hover:scale-110 transition-all duration-700 ease-out pointer-events-none"></div>
-              <div className="relative z-10">
-                <span className="text-zinc-700 font-mono text-2xl font-bold tracking-tighter mb-6 block group-hover:text-zinc-500 transition-colors">03 /</span>
-                <h3 className="text-2xl md:text-3xl font-black text-white mb-4 tracking-tight">Optimización de Equipos</h3>
-                <p className="text-zinc-400 leading-relaxed max-w-sm">
-                  Actualización estratégica de componentes (SSD, ampliación de RAM) y software para darle una segunda vida a computadoras lentas.
-                </p>
-              </div>
-              <div className="relative z-10 mt-10">
-                <a href="#detalle-optimizacion" className="inline-flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-white group-hover:text-blue-400 transition-colors">
-                  Explorar
-                  <svg className="w-5 h-5 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                </a>
-              </div>
-            </motion.article>
-
-            {/* Tarjeta 3 */}
-            <motion.article 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="group relative bg-zinc-950/40 backdrop-blur-md border border-zinc-800 p-8 md:p-12 min-h-[340px] flex flex-col justify-between overflow-hidden transition-colors duration-500 hover:border-zinc-600"
-            >
-              <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-red-500/5 rounded-full blur-[80px] group-hover:bg-red-500/15 group-hover:scale-110 transition-all duration-700 ease-out pointer-events-none"></div>
-              <div className="relative z-10">
-                <span className="text-zinc-700 font-mono text-2xl font-bold tracking-tighter mb-6 block group-hover:text-zinc-500 transition-colors">04 /</span>
-                <h3 className="text-2xl md:text-3xl font-black text-white mb-4 tracking-tight">Cámaras de Seguridad</h3>
-                <p className="text-zinc-400 leading-relaxed max-w-sm">
-                  Instalación profesional de sistemas de videovigilancia CCTV de alta definición. Configuración de DVRs y monitoreo remoto 24/7.
-                </p>
-              </div>
-              <div className="relative z-10 mt-10">
-                <a href="#detalle-cctv" className="inline-flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-white group-hover:text-red-400 transition-colors">
-                  Explorar
-                  <svg className="w-5 h-5 transform group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                </a>
-              </div>
-            </motion.article>
-
-            
-
-          </div>
-        </div>
-      </section>
-
-      {/* --- SECCIONES DE DETALLE (MINIMALISTA / FIXED IMAGES) --- */}
-      <div className="flex flex-col gap-32 py-32 border-b border-zinc-900">
-
-        {/* 1. DESARROLLO WEB */}
-        <section id="detalle-desarrollo" className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
-            
-            {/* Texto Flotante (Hace scroll) */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-20%" }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="lg:col-span-6 z-20 pb-10"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <span className="w-2 h-2 rounded-none bg-white shadow-[0_0_8px_rgba(255,255,255,0.4)]"></span>
-                <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">Sistemas</span>
-              </div>
-              <h2 className="text-3xl md:text-5xl font-medium tracking-tight text-white mb-6 leading-tight">
-                Desarrollo web a medida.
-              </h2>
-              <div className="text-sm font-mono text-zinc-400 leading-relaxed space-y-4 max-w-md mb-8">
-                <p>Llevamos tu negocio al mundo digital utilizando tecnologías modernas y eficientes.</p>
-                <p>Desde una landing page de alta conversión para captar clientes, hasta sistemas complejos de gestión para administrar usuarios e inventarios.</p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-0 border border-zinc-800 w-fit">
-                <a href="#contacto" className="bg-white text-black px-6 py-3 text-xs font-mono font-bold hover:bg-zinc-200 transition-colors text-center">
-                  Cotizar
-                </a>
-                <Link href="/portfolio" className="bg-transparent text-zinc-400 px-6 py-3 text-xs font-mono font-bold hover:text-white hover:bg-zinc-900 transition-colors text-center border-t sm:border-t-0 sm:border-l border-zinc-800">
-                  Ver portfolio
-                </Link>
-              </div>
-            </motion.div>
-
-            {/* Imagen Fija (Sticky) */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-20%" }}
-              transition={{ duration: 1, ease: "easeOut" }}
-              className="lg:col-span-6 lg:sticky lg:top-40 flex justify-center lg:justify-end w-full"
-            >
-              <div className="relative w-full max-w-[380px] aspect-[4/5] border border-zinc-800 bg-zinc-950 p-2">
-                <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none"></div>
-                <div className="relative w-full h-full">
-                  <Image src="/desarrollo-nuevo.webp" alt="Desarrollo Web" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover opacity-80" />
-                </div>
-              </div>
-            </motion.div>
-
-          </div>
-        </section>
-
-        {/* 2. MANTENIMIENTO DE PC */}
-        <section id="detalle-mantenimiento" className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
-            
-            {/* Texto Flotante */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-20%" }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="lg:col-span-6 z-20 pb-10"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <span className="w-2 h-2 rounded-none bg-[#E1F030]"></span>
-                <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">Mantenimiento</span>
-              </div>
-              <h2 className="text-3xl md:text-5xl font-medium tracking-tight text-white mb-6 leading-tight">
-                Mantenimiento y reparación de PC.
-              </h2>
-              <div className="text-sm font-mono text-zinc-400 leading-relaxed space-y-4 max-w-md">
-                <p>Un equipo lento o con sobrecalentamiento reduce tu productividad y acorta la vida útil de tus componentes.</p>
-                <p>Realizamos diagnósticos precisos, limpieza física profunda y solución a fallas de hardware para que tu equipo vuelva a funcionar como el primer día.</p>
-                <ul className="space-y-2 mt-4 text-zinc-500">
-                  <li className="flex gap-2"><span className="text-zinc-300">/</span> Limpieza de virus y malware.</li>
-                  <li className="flex gap-2"><span className="text-zinc-300">/</span> Reinstalación de sistemas (Windows/Linux).</li>
-                  <li className="flex gap-2"><span className="text-zinc-300">/</span> Backup y resguardo de información.</li>
-                </ul>
-              </div>
-            </motion.div>
-
-            {/* Imagen Fija */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-20%" }}
-              transition={{ duration: 1, ease: "easeOut" }}
-              className="lg:col-span-6 lg:sticky lg:top-40 flex justify-center lg:justify-end w-full"
-            >
-              <div className="relative w-full max-w-[380px] aspect-[4/5] border border-zinc-800 bg-zinc-950 p-2">
-                <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none"></div>
-                <div className="relative w-full h-full">
-                  <Image src="/img-reparacion.webp" alt="Servicio técnico de PC" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover opacity-80" />
-                </div>
-              </div>
-            </motion.div>
-
-          </div>
-        </section>
-
-        {/* 3. OPTIMIZACIÓN */}
-        <section id="detalle-optimizacion" className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
-            
-            {/* Texto Flotante */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-20%" }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="lg:col-span-6 z-20 pb-10"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <span className="w-2 h-2 rounded-none bg-zinc-400"></span>
-                <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">Hardware</span>
-              </div>
-              <h2 className="text-3xl md:text-5xl font-medium tracking-tight text-white mb-6 leading-tight">
-                Optimización y segunda vida.
-              </h2>
-              <div className="text-sm font-mono text-zinc-400 leading-relaxed space-y-4 max-w-md">
-                <p>No necesitas comprar una computadora nueva. Con actualizaciones estratégicas, podemos revivir ese equipo que tenés sin usar.</p>
-                <p>La instalación de un disco de estado sólido (SSD) y la ampliación de memoria RAM son inversiones pequeñas que ofrecen un cambio radical en la velocidad.</p>
-                <ul className="space-y-2 mt-4 text-zinc-500">
-                  <li className="flex gap-2"><span className="text-zinc-300">/</span> Clonación de discos a SSD sin perder datos.</li>
-                  <li className="flex gap-2"><span className="text-zinc-300">/</span> Asesoramiento y armado a medida.</li>
-                  <li className="flex gap-2"><span className="text-zinc-300">/</span> Optimización de recursos de red.</li>
-                </ul>
-              </div>
-            </motion.div>
-
-            {/* Imagen Fija */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-20%" }}
-              transition={{ duration: 1, ease: "easeOut" }}
-              className="lg:col-span-6 lg:sticky lg:top-40 flex justify-center lg:justify-end w-full"
-            >
-              <div className="relative w-full max-w-[380px] aspect-[4/5] border border-zinc-800 bg-zinc-950 p-2">
-                <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none"></div>
-                <div className="relative w-full h-full">
-                  <Image src="/img-opti.webp" alt="Hardware SSD y RAM" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover opacity-80" />
-                </div>
-              </div>
-            </motion.div>
-
-          </div>
-        </section>
-
-        {/* 4. INSTALACIÓN CCTV */}
-        <section id="detalle-cctv" className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
-            
-            {/* Texto Flotante */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-20%" }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="lg:col-span-6 z-20 pb-10"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <span className="w-2 h-2 rounded-none bg-zinc-600"></span>
-                <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">Seguridad</span>
-              </div>
-              <h2 className="text-3xl md:text-5xl font-medium tracking-tight text-white mb-6 leading-tight">
-                Instalación de cámaras CCTV.
-              </h2>
-              <div className="text-sm font-mono text-zinc-400 leading-relaxed space-y-4 max-w-md">
-                <p>Realizamos instalaciones técnicas profesionales de sistemas de videovigilancia de alta definición.</p>
-                <p>Diseñamos la cobertura ideal para tu hogar o negocio. Podrás monitorear todo en tiempo real desde tu celular, estés donde estés.</p>
-                <ul className="space-y-2 mt-4 text-zinc-500">
-                  <li className="flex gap-2"><span className="text-zinc-300">/</span> Instalación de DVRs y cámaras HD.</li>
-                  <li className="flex gap-2"><span className="text-zinc-300">/</span> Acceso remoto en smartphones y PCs.</li>
-                  <li className="flex gap-2"><span className="text-zinc-300">/</span> Revisión de cableado estructurado.</li>
-                </ul>
-              </div>
-            </motion.div>
-
-            {/* Imagen Fija */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-20%" }}
-              transition={{ duration: 1, ease: "easeOut" }}
-              className="lg:col-span-6 lg:sticky lg:top-40 flex justify-center lg:justify-end w-full"
-            >
-              <div className="relative w-full max-w-[380px] aspect-[4/5] border border-zinc-800 bg-zinc-950 p-2">
-                <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none"></div>
-                <div className="relative w-full h-full">
-                  <Image src="/img-camaras.webp" alt="Instalación CCTV" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover opacity-80" />
-                </div>
-              </div>
-            </motion.div>
-
-          </div>
-        </section>
-
-      </div>
-
-      {/* --- SECCIÓN SOBRE NOSOTROS (MINIMALISTA) --- */}
-      <section id="sobre-nosotros" className="w-full py-32 border-b border-zinc-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
-            
-            {/* Texto Flotante (Hace scroll) */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-20%" }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="lg:col-span-6 z-20 pb-10"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <span className="w-2 h-2 rounded-none bg-blue-500"></span>
-                <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">Leandro David</span>
-              </div>
-              <h2 className="text-3xl md:text-5xl font-medium tracking-tight text-white mb-6 leading-tight">
-                Sobre Compufix.
-              </h2>
-              <div className="text-sm font-mono text-zinc-400 leading-relaxed space-y-4 max-w-md mb-8">
-                <p>¡Hola! Soy técnico especialista, especializado en dar soluciones tecnológicas integrales.</p>
-                <p>Tengo 32 años y resido en Presidencia Roque Sáenz Peña, Chaco. Mi pasión por la tecnología me llevó a formarme continuamente para ofrecer un servicio de excelencia.</p>
-                <p>Con especializaciones en redes, reparación y mantenimiento de PC, sistemas de seguridad y desarrollo web full stack, combino el hardware y el software para potenciar tu presencia digital y resguardar tu equipamiento.</p>
-                <p>Este proyecto comenzó en 2016 desde mi casa, donde armé un pequeño taller equipado para trabajar a diario con el objetivo de darle una segunda vida a tus dispositivos y crear herramientas digitales a medida.</p>
-              </div>
-              <div className="border border-zinc-800 w-fit">
-                <a
-                  href="#contacto"
-                  className="block bg-white text-black px-6 py-3 text-xs font-mono font-bold hover:bg-zinc-200 transition-colors text-center uppercase tracking-widest"
-                >
-                  Contactar
-                </a>
-              </div>
-            </motion.div>
-
-            {/* Imagen Fija (Sticky) */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-20%" }}
-              transition={{ duration: 1, ease: "easeOut" }}
-              className="lg:col-span-6 lg:sticky lg:top-40 flex justify-center lg:justify-end w-full"
-            >
-              <div className="relative w-full max-w-[380px] aspect-[4/5] border border-zinc-800 bg-zinc-950 p-2">
-                <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none"></div>
-                <div className="relative w-full h-full">
-                  <Image
-                    src="/img-about.webp"
-                    alt="Leandro David trabajando en su taller"
-                    fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover opacity-80"
-                  />
-                </div>
-              </div>
-            </motion.div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* --- OPCIÓN 2: TIPOGRAFÍA MONUMENTAL --- */}
-      <section id="proceso" className="py-32 overflow-hidden relative border-b border-zinc-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          
-          <div className="mb-24 md:w-1/2">
-            <h2 className="text-3xl md:text-6xl font-medium tracking-tight text-white mb-6">
-              Nuestra forma de trabajar.
-            </h2>
-            <p className="text-sm font-mono text-zinc-500">
-              Un proceso de tres etapas diseñado para resolver problemas técnicos sin fricciones.
+          <div className="w-full border-t border-zinc-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-xs font-mono text-zinc-600 text-center md:text-left">
+              © {new Date().getFullYear()} Compufix-sp. Todos los derechos reservados.
+            </p>
+            <p className="text-xs font-mono text-zinc-600 text-center md:text-right">
+              Diseñado y desarrollado por <strong className="text-zinc-400 font-normal">COMPUFIX-SP</strong>
             </p>
           </div>
-
-          <div className="relative">
-            <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-[1px] bg-zinc-800 -translate-x-1/2"></div>
-
-            <div className="space-y-24 md:space-y-40">
-              
-              <motion.div 
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-20%" }}
-                transition={{ duration: 0.7 }}
-                className="relative flex flex-col md:flex-row items-start md:items-center justify-between group"
-              >
-                <div className="absolute -top-10 left-0 md:left-auto md:right-1/2 md:mr-10 text-[120px] md:text-[180px] font-black text-white/5 tracking-tighter leading-none pointer-events-none select-none">
-                  01
-                </div>
-                <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full transition-transform duration-500 group-hover:scale-150"></div>
-                <div className="md:w-5/12 ml-12 md:ml-0 md:text-right md:pr-16 relative z-10">
-                  <h3 className="text-2xl font-bold text-white mb-4 uppercase tracking-widest text-sm">Diagnóstico</h3>
-                </div>
-                <div className="md:w-5/12 ml-12 md:ml-0 md:pl-16 relative z-10">
-                  <p className="text-sm font-mono text-zinc-400 leading-relaxed">
-                    Evaluamos a fondo si tu equipo necesita mantenimiento, actualización o si querés un desarrollo web.
-                  </p>
-                </div>
-              </motion.div>
-
-              <motion.div 
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-20%" }}
-                transition={{ duration: 0.7 }}
-                className="relative flex flex-col md:flex-row-reverse items-start md:items-center justify-between group"
-              >
-                <div className="absolute -top-10 left-0 md:left-1/2 md:ml-10 text-[120px] md:text-[180px] font-black text-white/5 tracking-tighter leading-none pointer-events-none select-none">
-                  02
-                </div>
-                <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-blue-500 rounded-full transition-transform duration-500 group-hover:scale-150"></div>
-                <div className="md:w-5/12 ml-12 md:ml-0 md:pl-16 relative z-10">
-                  <h3 className="text-2xl font-bold text-white mb-4 uppercase tracking-widest text-sm">Propuesta</h3>
-                </div>
-                <div className="md:w-5/12 ml-12 md:ml-0 md:text-right md:pr-16 relative z-10">
-                  <p className="text-sm font-mono text-zinc-400 leading-relaxed">
-                    Te enviamos un presupuesto claro. Explicamos repuestos, tecnologías y tiempos estimados. Sin letras chicas.
-                  </p>
-                </div>
-              </motion.div>
-
-              <motion.div 
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-20%" }}
-                transition={{ duration: 0.7 }}
-                className="relative flex flex-col md:flex-row items-start md:items-center justify-between group"
-              >
-                <div className="absolute -top-10 left-0 md:left-auto md:right-1/2 md:mr-10 text-[120px] md:text-[180px] font-black text-white/5 tracking-tighter leading-none pointer-events-none select-none">
-                  03
-                </div>
-                <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#E1F030] rounded-full transition-transform duration-500 group-hover:scale-150"></div>
-                <div className="md:w-5/12 ml-12 md:ml-0 md:text-right md:pr-16 relative z-10">
-                  <h3 className="text-2xl font-bold text-white mb-4 uppercase tracking-widest text-sm">Ejecución</h3>
-                </div>
-                <div className="md:w-5/12 ml-12 md:ml-0 md:pl-16 relative z-10">
-                  <p className="text-sm font-mono text-zinc-400 leading-relaxed">
-                    Ponemos manos a la obra. Te mantenemos informado y entregamos todo testeado, funcionando al 100%.
-                  </p>
-                </div>
-              </motion.div>
-
-            </div>
-          </div>
         </div>
-      </section>
 
-      {/* --- SECCIÓN PREGUNTAS FRECUENTES --- */}
-      <section id="faq" className="py-32 overflow-hidden border-b border-zinc-900">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="text-center mb-16 relative flex flex-col items-center"
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-              <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">Soporte</span>
-            </div>
-            <h2 className="text-3xl md:text-5xl font-medium tracking-tight text-white mb-4">
-              Preguntas frecuentes.
-            </h2>
-            <p className="text-sm font-mono text-zinc-500 mt-4 max-w-xl mx-auto">
-              Despejá tus dudas rápidas antes de arrancar tu proyecto con nosotros.
-            </p>
-          </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-            className="space-y-4"
-          >
-            <details className="group border border-zinc-800 bg-black hover:bg-zinc-900/50 transition-colors [&_summary::-webkit-details-marker]:hidden">
-              <summary className="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-white font-medium">
-                <h3 className="text-base md:text-lg">¿Cuánto demora el mantenimiento de pc o notebook?</h3>
-                <span className="relative font-mono text-zinc-500 font-bold shrink-0 group-hover:text-white transition-colors">
-                  <span className="group-open:hidden">[+]</span>
-                  <span className="hidden group-open:inline">[-]</span>
-                </span>
-              </summary>
-              <div className="px-6 pb-6 text-sm font-mono text-zinc-400 leading-relaxed border-t border-zinc-800/50 pt-4 mt-2">
-                Depende del diagnóstico inicial, pero los trabajos generales de limpieza física, cambio de pasta térmica y optimización de equipos suelen estar listos entre 24 y 48 horas. Siempre te informamos el estado y pedimos tu confirmación antes de avanzar con cambios o repuestos.
-              </div>
-            </details>
-
-            <details className="group border border-zinc-800 bg-black hover:bg-zinc-900/50 transition-colors [&_summary::-webkit-details-marker]:hidden">
-              <summary className="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-white font-medium">
-                <h3 className="text-base md:text-lg">Si instalan Windows en mi equipo, ¿pierdo mi información?</h3>
-                <span className="relative font-mono text-zinc-500 font-bold shrink-0 group-hover:text-white transition-colors">
-                  <span className="group-open:hidden">[+]</span>
-                  <span className="hidden group-open:inline">[-]</span>
-                </span>
-              </summary>
-              <div className="px-6 pb-6 text-sm font-mono text-zinc-400 leading-relaxed border-t border-zinc-800/50 pt-4 mt-2">
-                <strong className="text-white">Para nada.</strong> Tu tranquilidad es nuestra prioridad. Antes de realizar cualquier instalación o formateo, llevamos a cabo un <strong className="text-zinc-300">backup preventivo</strong> de todos los archivos que quieras conservar.
-              </div>
-            </details>
-
-            <details className="group border border-zinc-800 bg-black hover:bg-zinc-900/50 transition-colors [&_summary::-webkit-details-marker]:hidden">
-              <summary className="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-white font-medium">
-                <h3 className="text-base md:text-lg">¿Cómo es el proceso para un desarrollo web?</h3>
-                <span className="relative font-mono text-zinc-500 font-bold shrink-0 group-hover:text-white transition-colors">
-                  <span className="group-open:hidden">[+]</span>
-                  <span className="hidden group-open:inline">[-]</span>
-                </span>
-              </summary>
-              <div className="px-6 pb-6 text-sm font-mono text-zinc-400 leading-relaxed border-t border-zinc-800/50 pt-4 mt-2">
-                Lo dividimos en etapas muy claras. Primero charlamos sobre qué necesita tu negocio. Luego, armamos una propuesta de diseño y funciones. Una vez aprobada, pasamos al código y nos mantenemos en contacto para mostrarte los avances.
-              </div>
-            </details>
-
-            <details className="group border border-zinc-800 bg-black hover:bg-zinc-900/50 transition-colors [&_summary::-webkit-details-marker]:hidden">
-              <summary className="flex cursor-pointer items-center justify-between gap-1.5 p-6 text-white font-medium">
-                <h3 className="text-base md:text-lg">¿Brindan garantía por las reparaciones?</h3>
-                <span className="relative font-mono text-zinc-500 font-bold shrink-0 group-hover:text-white transition-colors">
-                  <span className="group-open:hidden">[+]</span>
-                  <span className="hidden group-open:inline">[-]</span>
-                </span>
-              </summary>
-              <div className="px-6 pb-6 text-sm font-mono text-zinc-400 leading-relaxed border-t border-zinc-800/50 pt-4 mt-2">
-                Totalmente. Tanto la mano de obra en reparación de pc como los componentes nuevos que instalamos (como discos SSD o memorias RAM) cuentan con garantía. Buscamos relaciones a largo plazo.
-              </div>
-            </details>
-
-          </motion.div>
-        </div>
-      </section>
-
-      {/* --- SECCIÓN FORMULARIO DE CONTACTO --- */}
-      <section id="contacto" className="py-32 overflow-hidden relative border-b border-zinc-900">
-
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="text-center mb-16 flex flex-col items-center"
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <span className="w-2 h-2 rounded-full bg-[#E1F030]"></span>
-              <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">Contacto</span>
-            </div>
-            <h2 className="text-3xl md:text-5xl font-medium tracking-tight text-white mb-4">
-              Envianos tu consulta.
-            </h2>
-            <p className="text-sm font-mono text-zinc-500 mt-4 max-w-xl mx-auto">
-              Completá el formulario y nos pondremos en contacto con vos a la brevedad para asesorarte.
-            </p>
-          </motion.div>
-
-          <motion.form 
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-            onSubmit={manejarEnvio} 
-            className="grid grid-cols-1 gap-y-6"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="nombre" className="block text-xs font-mono text-zinc-500 mb-2 uppercase tracking-widest">Nombre completo</label>
-                <input
-                  type="text"
-                  name="nombre"
-                  id="nombre"
-                  placeholder="Ej: Juan Pérez"
-                  className="w-full px-4 py-3 bg-black border border-zinc-800 text-white placeholder-zinc-700 focus:outline-none focus:border-white transition-colors font-mono text-sm"
-                  required
-                />
-              </div>
-
-              <div>
-                <label htmlFor="email" className="block text-xs font-mono text-zinc-500 mb-2 uppercase tracking-widest">Correo electrónico</label>
-                <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  placeholder="ejemplo@correo.com"
-                  className="w-full px-4 py-3 bg-black border border-zinc-800 text-white placeholder-zinc-700 focus:outline-none focus:border-white transition-colors font-mono text-sm"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="servicio" className="block text-xs font-mono text-zinc-500 mb-2 uppercase tracking-widest">¿En qué podemos ayudarte?</label>
-              <div className="relative">
-                <select
-                  id="servicio"
-                  name="servicio"
-                  className="w-full px-4 py-3 bg-black border border-zinc-800 text-white appearance-none cursor-pointer focus:outline-none focus:border-white transition-colors font-mono text-sm"
-                >
-                  <option>Mantenimiento y Reparación de PC</option>
-                  <option>Optimización de Equipos</option>
-                  <option>Instalación de Cámaras (CCTV)</option>
-                  <option>Desarrollo Web / Sistemas</option>
-                  <option>Otro motivo</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-zinc-500">
-                  <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="mensaje" className="block text-xs font-mono text-zinc-500 mb-2 uppercase tracking-widest">Tu mensaje</label>
-              <textarea
-                id="mensaje"
-                name="mensaje"
-                rows={4}
-                placeholder="Contanos un poco más sobre lo que necesitás..."
-                className="w-full px-4 py-3 bg-black border border-zinc-800 text-white placeholder-zinc-700 resize-none focus:outline-none focus:border-white transition-colors font-mono text-sm"
-                required
-              ></textarea>
-            </div>
-
-            {estado === 'exito' && (
-              <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="p-4 border border-[#25D366] bg-black text-[#25D366] text-sm font-mono flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                [OK] Mensaje enviado con éxito.
-              </motion.div>
-            )}
-
-            {estado === 'error' && (
-              <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="p-4 border border-red-500 bg-black text-red-500 text-sm font-mono flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
-                [ERROR] Hubo un problema. Intentá nuevamente.
-              </motion.div>
-            )}
-
-            <button
-              type="submit"
-              disabled={estado === 'enviando'}
-              className={`w-full mt-4 text-black font-mono font-bold uppercase tracking-widest text-sm py-4 transition-all duration-300 flex justify-center items-center gap-2
-                ${estado === 'enviando' ? 'bg-zinc-600 cursor-wait opacity-80' : 'bg-white hover:bg-zinc-200 active:scale-[0.99]'}`}
-            >
-              {estado === 'enviando' ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Enviando...
-                </>
-              ) : ('Enviar mensaje')}
-            </button>
-          </motion.form>
-
-        </div>
-      </section>
-
-      {/* --- SECCIÓN REDES SOCIALES --- */}
-      <section id="sociales" className="py-32 overflow-hidden relative">
-        
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="flex flex-col items-center"
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <span className="w-2 h-2 rounded-full bg-white"></span>
-              <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">Redes</span>
-            </div>
-            <h2 className="text-3xl md:text-5xl font-medium tracking-tight text-white mb-4">
-              ¡Conectemos!
-            </h2>
-            <p className="text-sm font-mono text-zinc-500 mb-16 max-w-xl mx-auto mt-4">
-              Contactanos directamente o seguinos en nuestras redes sociales para ver nuestros últimos trabajos y novedades.
-            </p>
-          </motion.div>
-          
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-6">
-
-            <motion.a 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
-              href="https://wa.me/543644589416?text=Hola%20Compufix!%20Me%20contacto%20desde%20su%20página%20web%20para%20pedir%20un%20presupuesto." 
-              target="_blank" 
-              rel="noopener noreferrer"
-              aria-label="Ir a WhatsApp de Compufix"
-              className="group flex items-center justify-center gap-4 px-8 py-4 border border-zinc-800 bg-black text-white font-mono text-sm uppercase tracking-widest font-bold transition-all duration-300 w-full sm:w-auto hover:border-white hover:bg-zinc-900"
-            >
-              <svg aria-hidden="true" className="text-zinc-500 group-hover:text-[#25D366] transition-colors duration-300" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73.0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
-              </svg>
-              WhatsApp
-            </motion.a>
-            
-            <motion.a 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
-              href="https://www.instagram.com/compufix.sp" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              aria-label="Perfil de Instagram de Compufix"
-              className="group flex items-center justify-center gap-4 px-8 py-4 border border-zinc-800 bg-black text-white font-mono text-sm uppercase tracking-widest font-bold transition-all duration-300 w-full sm:w-auto hover:border-white hover:bg-zinc-900"
-            >
-              <svg aria-hidden="true" className="text-zinc-500 group-hover:text-[#E1306C] transition-colors duration-300" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-              </svg>
-              Instagram
-            </motion.a>
-
-            <motion.a 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, ease: "easeOut", delay: 0.3 }}
-              href="https://www.facebook.com/compufix.sp" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              aria-label="Página de Facebook de Compufix"
-              className="group flex items-center justify-center gap-4 px-8 py-4 border border-zinc-800 bg-black text-white font-mono text-sm uppercase tracking-widest font-bold transition-all duration-300 w-full sm:w-auto hover:border-white hover:bg-zinc-900"
-            >
-              <svg aria-hidden="true" className="text-zinc-500 group-hover:text-[#1877F2] transition-colors duration-300" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-              </svg>
-              Facebook
-            </motion.a>
-
-          </div>
-        </div>
-      </section>
-
-      {/* --- FOOTER (ESTILO MINIMALISTA) --- */}
-      <footer className="bg-black py-16 border-t border-zinc-900 text-zinc-400 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left items-center md:items-start">
-            
-            <div className="flex flex-col items-center md:items-start">
-              <Image 
-                src="/logo-compufix.webp" 
-                alt="Logotipo de Compufix en pie de página" 
-                width={120} 
-                height={40} 
-                className="w-auto h-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
-              />
-            </div>
-
-            <div className="flex flex-col items-center md:items-start">
-              <h4 className="font-mono font-bold text-white mb-6 uppercase tracking-widest text-xs">Contacto directo</h4>
-              <ul className="space-y-4 text-sm font-mono">
-                <li className="flex items-center gap-3 justify-center md:justify-start">
-                  <span className="text-zinc-600">/</span>
-                  <a href="mailto:compufix.sp@gmail.com" className="hover:text-white transition-colors">compufix.sp@gmail.com</a>
-                </li>
-                <li className="flex items-center gap-3 justify-center md:justify-start">
-                  <span className="text-zinc-600">/</span>
-                  <a href="https://wa.me/543644589416" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">+54 364 458-9416</a>
-                </li>
-                <li className="flex items-center gap-3 justify-center md:justify-start">
-                  <span className="text-zinc-600">/</span>
-                  <span>Presidencia Roque Sáenz Peña, Chaco</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="flex flex-col items-center md:items-end justify-center space-y-4 text-xs font-mono text-zinc-500">
-              <Link href="/politica-de-privacidad" className="hover:text-white transition-colors">Política de privacidad</Link>
-              <Link href="/politica-de-cookies" className="hover:text-white transition-colors">Política de cookies</Link>
-            </div>
-
-          </div>
-
-          <div className="mt-16 pt-8 border-t border-zinc-900 text-center flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-xs font-mono text-zinc-600">© {new Date().getFullYear()} Compufix.sp. Todos los derechos reservados.</p>
-            <p className="text-zinc-700 text-xs font-mono font-bold tracking-widest uppercase">
-              Sistemas & Hardware
-            </p>
-          </div>
+        <div aria-hidden="true" className="absolute left-1/2 -translate-x-1/2 bottom-[-4vw] w-full text-center pointer-events-none select-none z-0 overflow-hidden">
+          <span className="text-[15vw] font-black uppercase tracking-tighter text-zinc-900/30 whitespace-nowrap">
+            COMPUFIX.SP
+          </span>
         </div>
       </footer>
 
-      {/* --- BOTONES FLOTANTES MINIMALISTAS --- */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-4">
+      {/* BOTONES FLOTANTES */}
+      <div className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50 flex flex-col gap-4 items-center pointer-events-none">
         
-        <button
-          onClick={volverArriba}
-          aria-label="Volver arriba"
-          className={`group bg-zinc-900 border border-zinc-800 w-10 h-10 flex items-center justify-center transition-all duration-500 hover:bg-white ${
-            mostrarBoton ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"
-          }`}
+        <button 
+          onClick={volverArriba} 
+          className={`w-12 h-12 bg-black border border-zinc-800 flex items-center justify-center transition-all duration-500 hover:bg-white text-zinc-400 hover:text-black pointer-events-auto shadow-[0_0_20px_rgba(0,0,0,0.5)]
+            ${mostrarBoton ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"}
+          `}
+          aria-label="Volver arriba de la página"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400 group-hover:text-black transition-colors">
-            <line x1="12" y1="19" x2="12" y2="5"></line>
-            <polyline points="5 12 12 5 19 12"></polyline>
-          </svg>
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7"></path></svg>
         </button>
 
-        <a
-          href="https://wa.me/543644589416?text=Hola%20Compufix!%20Me%20contacto%20desde%20su%20página%20web%20para%20pedir%20un%20presupuesto."
-          target="_blank"
+        <a 
+          href="https://wa.me/543644589416?text=Hola%20Compufix!%20Me%20contacto%20desde%20su%20página%20web%20para%20hacer%20una%20consulta." 
+          target="_blank" 
           rel="noopener noreferrer"
-          aria-label="Contactar por WhatsApp"
-          className="bg-[#25D366] w-12 h-12 flex items-center justify-center hover:bg-[#1EBE5D] hover:scale-105 transition-all duration-300"
+          className="w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform duration-300 pointer-events-auto shadow-[0_0_20px_rgba(37,211,102,0.3)] hover:shadow-[0_0_30px_rgba(37,211,102,0.5)]"
+          aria-label="Contactar rápidamente al Servicio Técnico por WhatsApp"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 16 16">
-            <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73.0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+          <svg className="w-7 h-7 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
           </svg>
         </a>
       </div>
+
     </main>
   );
 }

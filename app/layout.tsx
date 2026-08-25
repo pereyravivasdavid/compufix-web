@@ -11,15 +11,15 @@ const roboto = Roboto({
 
 // Metadatos para SEO
 export const metadata: Metadata = {
-  title: "Compufix | Mantenimiento de pc y desarrollo web",
+  title: "Compufix-sp | Mantenimiento de pc y desarrollo web",
   description: "Soluciones técnicas por Leandro David en Presidencia Roque Sáenz Peña, Chaco. Especialista en reparación de pc, instalación de cámaras de seguridad y desarrollo web a medida.",
   keywords: "mantenimiento de pc, reparación de notebooks, cámaras de seguridad, desarrollo web, Presidencia Roque Sáenz Peña, Chaco, soporte técnico",
   authors: [{ name: "Leandro David" }],
   openGraph: {
-    title: "Compufix | Soluciones tecnológicas",
+    title: "Compufix-sp | Soluciones tecnológicas",
     description: "Mantenimiento de pc, instalación de cámaras de seguridad y desarrollo web a medida en Presidencia Roque Sáenz Peña.",
-    url: "https://tudominio.com", // Acá vas a poner tu dominio final cuando lo tengas
-    siteName: "Compufix",
+    url: "https://www.compufix-sp.com.ar/", // Acá vas a poner tu dominio final cuando lo tengas
+    siteName: "Compufix-sp",
     locale: "es_AR",
     type: "website",
   },
