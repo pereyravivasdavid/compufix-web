@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRef, useEffect, useState } from "react";
-import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, AnimatePresence, MotionConfig } from "framer-motion";
 
 // Componente FAQ Optimizado
 const FaqItem = ({ pregunta, respuesta }: { pregunta: string, respuesta: string }) => {
@@ -46,6 +46,7 @@ export default function Home() {
   // ESTADOS GLOBALES
   // ---------------------------------------------------
   const [mostrarBoton, setMostrarBoton] = useState(false);
+  const [menuAbierto, setMenuAbierto] = useState(false);
   const [estado, setEstado] = useState<'ideal' | 'enviando' | 'exito' | 'error'>('ideal');
 
   useEffect(() => {
@@ -53,6 +54,13 @@ export default function Home() {
     window.addEventListener("scroll", controlarScroll);
     return () => window.removeEventListener("scroll", controlarScroll);
   }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = menuAbierto ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuAbierto]);
+
+  const cerrarMenu = () => setMenuAbierto(false);
 
   const manejarEnvio = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -99,20 +107,100 @@ export default function Home() {
   const cctvImageY = useTransform(cctvProgress, [0, 1], ["-20%", "20%"]);
 
   return (
+    <MotionConfig reducedMotion="user">
     <main className="bg-black text-white min-h-screen selection:bg-white selection:text-black">
       
       {/* HEADER */}
-      <header className="fixed top-0 w-full z-50 p-6 md:px-12 flex justify-between items-center mix-blend-difference pointer-events-none">
-        <div className="font-black text-xl tracking-tighter uppercase pointer-events-auto">
+      <header className="header-no-blend fixed top-0 w-full z-50 p-6 md:px-12 flex justify-between items-center mix-blend-difference pointer-events-none">
+        <a href="#inicio" onClick={cerrarMenu} aria-label="Ir al inicio de Compufix" className="font-black text-xl tracking-tighter uppercase pointer-events-auto">
           Compufix.SP
-        </div>
-        <a href="#contacto" className="border border-white px-6 py-2 text-xs font-mono uppercase tracking-widest hover:bg-white hover:text-black transition-colors pointer-events-auto">
-          Contacto
         </a>
+
+        {/* NAV DESKTOP */}
+        <nav aria-label="Navegación principal" className="hidden md:flex items-center gap-8 pointer-events-auto">
+          <a href="#servicios" className="text-xs font-mono uppercase tracking-widest text-zinc-400 hover:text-white transition-colors">Servicios</a>
+          <a href="#sobre-nosotros" className="text-xs font-mono uppercase tracking-widest text-zinc-400 hover:text-white transition-colors">Nosotros</a>
+          <a href="/portfolio" className="text-xs font-mono uppercase tracking-widest text-zinc-400 hover:text-white transition-colors">Portfolio</a>
+          <a href="#proceso" className="text-xs font-mono uppercase tracking-widest text-zinc-400 hover:text-white transition-colors">Proceso</a>
+          <a href="#faq" className="text-xs font-mono uppercase tracking-widest text-zinc-400 hover:text-white transition-colors">FAQ</a>
+          <a href="#contacto" className="ml-2 border border-white px-6 py-2 text-xs font-mono uppercase tracking-widest hover:bg-white hover:text-black transition-colors">
+            Contacto
+          </a>
+        </nav>
+
+        {/* BOTÓN MENÚ MÓVIL */}
+        <button
+          onClick={() => setMenuAbierto(!menuAbierto)}
+          aria-label={menuAbierto ? "Cerrar menú de navegación" : "Abrir menú de navegación"}
+          aria-expanded={menuAbierto}
+          className="md:hidden flex flex-col justify-center items-center gap-[5px] w-11 h-11 border border-white px-0 py-0 hover:bg-white hover:text-black transition-colors pointer-events-auto"
+        >
+          <span className={`block w-5 h-[2px] bg-current transition-transform duration-300 ${menuAbierto ? "rotate-45 translate-y-[7px]" : ""}`}></span>
+          <span className={`block w-5 h-[2px] bg-current transition-opacity duration-300 ${menuAbierto ? "opacity-0" : ""}`}></span>
+          <span className={`block w-5 h-[2px] bg-current transition-transform duration-300 ${menuAbierto ? "-rotate-45 -translate-y-[7px]" : ""}`}></span>
+        </button>
       </header>
 
+      {/* MENÚ MÓVIL (OVERLAY) */}
+      <AnimatePresence>
+        {menuAbierto && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="fixed inset-0 z-[60] bg-[#050505] flex flex-col md:hidden"
+          >
+            <div className="flex justify-between items-center p-6">
+              <span className="font-black text-xl tracking-tighter uppercase">Compufix.SP</span>
+              <button
+                onClick={() => setMenuAbierto(false)}
+                aria-label="Cerrar menú"
+                className="w-11 h-11 flex items-center justify-center border border-white hover:bg-white hover:text-black transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+            </div>
+
+            <nav aria-label="Navegación móvil" className="flex flex-col px-6 mt-4">
+              {[
+                { href: "#servicios", label: "Servicios" },
+                { href: "#sobre-nosotros", label: "Nosotros" },
+                { href: "/portfolio", label: "Portfolio" },
+                { href: "#proceso", label: "Proceso" },
+                { href: "#faq", label: "FAQ" },
+              ].map((item, i) => (
+                <motion.a
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMenuAbierto(false)}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.05 * i }}
+                  className="group flex items-center justify-between py-5 border-b border-zinc-900 text-3xl font-black uppercase tracking-tighter text-zinc-500 hover:text-white transition-colors"
+                >
+                  {item.label}
+                  <span className="text-sm font-mono text-zinc-700 group-hover:text-zinc-400 transition-colors">0{i + 1}</span>
+                </motion.a>
+              ))}
+            </nav>
+
+            <div className="mt-auto px-6 pb-10 pt-8">
+              <a
+                href="#contacto"
+                onClick={() => setMenuAbierto(false)}
+                className="flex items-center justify-center gap-4 w-full border border-white bg-white text-black px-8 py-5 text-sm font-mono uppercase tracking-widest hover:opacity-80 transition-opacity"
+              >
+                Iniciar Consulta
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </a>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* 1: HERO */}
-      <section ref={heroRef} className="relative h-[150vh] bg-black">
+      <section id="inicio" ref={heroRef} className="relative h-[150vh] bg-black">
         <motion.div 
           style={{ scale: heroScale, opacity: heroOpacity }}
           className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-[#050505] origin-top"
@@ -122,12 +210,12 @@ export default function Home() {
           <motion.div style={{ y: heroTextY }} className="relative z-10 text-center px-4 flex flex-col items-center">
             <div className="inline-flex items-center gap-4 px-4 py-2 border border-zinc-800 bg-black mb-8 shadow-[4px_4px_0px_#18181b]">
               <span className="w-2 h-2 bg-white"></span>
-              <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">
+              <span className="text-[10px] sm:text-xs font-mono text-zinc-400 uppercase tracking-widest">
                 Presidencia Roque Sáenz Peña, Chaco
               </span>
             </div>
 
-            <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase leading-[0.85] mb-8">
+            <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase leading-[0.85] mb-8">
               Compufix <br />
               <span className="text-zinc-600">sp</span>
             </h1>
@@ -146,12 +234,12 @@ export default function Home() {
       </section>
 
       {/* 2: SERVICIOS */}
-      <section ref={horizontalRef} className="relative h-[600vh] bg-[#050505] z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.8)] border-t border-zinc-900">
+      <section id="servicios" ref={horizontalRef} className="relative h-[600vh] bg-[#050505] z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.8)] border-t border-zinc-900">
         <div className="sticky top-0 h-screen flex flex-col justify-end md:justify-center pb-12 md:pb-0 overflow-hidden">
           
           <div className="absolute left-6 md:left-12 top-28 md:top-32 z-0 pointer-events-none">
             <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest block mb-4">
-              // Catálogo de Servicios
+              {"// Catálogo de Servicios"}
             </span>
             <h2 className="text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter text-zinc-800 md:text-white/5 leading-[1.15] pt-2">
               Nuestras <br className="hidden md:block" /> Soluciones.
@@ -172,7 +260,7 @@ export default function Home() {
                 viewport={{ margin: "0px -15% 0px -15%", amount: "some" }} 
                 transition={{ duration: 0.5, ease: "easeOut" }}
                 // AGREGADO: min-h-[400px] md:min-h-[480px] para evitar que colapse en laptops
-                className="w-[85vw] md:w-[40vw] h-[55vh] md:h-[60vh] min-h-[400px] md:min-h-[480px] shrink-0 bg-[#0A0A0A] flex flex-col relative group overflow-hidden shadow-2xl border-none"
+                className="w-[88vw] md:w-[40vw] h-[55vh] md:h-[60vh] min-h-[340px] md:min-h-[480px] shrink-0 bg-[#0A0A0A] flex flex-col relative group overflow-hidden shadow-2xl border-none"
               >
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#18181b_1px,transparent_1px),linear-gradient(to_bottom,#18181b_1px,transparent_1px)] bg-[size:2rem_2rem] opacity-20 pointer-events-none"></div>
                 
@@ -199,7 +287,7 @@ export default function Home() {
       </section>
 
       {/* 3: SOBRE NOSOTROS */}
-      <section id="sobre-nosotros" className="relative bg-[#050505] py-32 border-t border-zinc-900 z-30">
+      <section id="sobre-nosotros" className="relative bg-[#050505] py-20 lg:py-32 border-t border-zinc-900 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-8 items-start">
             
@@ -284,9 +372,9 @@ export default function Home() {
       </section>
 
       {/* 4: DETALLE DESARROLLO */}
-      <section id="detalle-desarrollo" ref={desarrolloRef} className="relative bg-[#050505] py-32 border-t border-zinc-900 z-30 overflow-hidden">
+      <section id="detalle-desarrollo" ref={desarrolloRef} className="relative bg-[#050505] py-20 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-24 items-center">
             
             <div className="flex flex-col justify-center order-2 lg:order-1">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
@@ -305,7 +393,7 @@ export default function Home() {
 
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.2 }} className="border-t border-zinc-900 pt-8 mt-4">
                 <h3 className="text-xs font-mono text-zinc-600 uppercase tracking-widest mb-6">Stack Tecnológico</h3>
-                <ul className="grid grid-cols-2 gap-4">
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <li className="flex items-center gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> React & Next.js</li>
                   <li className="flex items-center gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Control Git / GitHub</li>
                   <li className="flex items-center gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Deploy en Vercel</li>
@@ -328,7 +416,7 @@ export default function Home() {
               </motion.div>
             </div>
 
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[4/5] md:aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group">
               <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
               <motion.div style={{ y: devImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
                 <Image src="/desarrollo-nuevo.webp" alt="Programación y Diseño de Sistemas Web a Medida" fill className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
@@ -340,11 +428,11 @@ export default function Home() {
       </section>
 
       {/* 5: DETALLE MANTENIMIENTO */}
-      <section id="detalle-mantenimiento" ref={mantenimientoRef} className="relative bg-[#050505] py-32 border-t border-zinc-900 z-30 overflow-hidden">
+      <section id="detalle-mantenimiento" ref={mantenimientoRef} className="relative bg-[#050505] py-20 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-24 items-center">
             
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[4/5] md:aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group">
               <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
               <motion.div style={{ y: mantImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
                 <Image src="/img-reparacion.webp" alt="Servicio Técnico, Mantenimiento y Reparación de PC en Chaco" fill className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
@@ -388,9 +476,9 @@ export default function Home() {
       </section>
 
       {/* 6: DETALLE OPTIMIZACIÓN */}
-      <section id="detalle-optimizacion" ref={optimizacionRef} className="relative bg-[#050505] py-32 border-t border-zinc-900 z-30 overflow-hidden">
+      <section id="detalle-optimizacion" ref={optimizacionRef} className="relative bg-[#050505] py-20 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-24 items-center">
             
             <div className="flex flex-col justify-center order-2 lg:order-1">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
@@ -425,7 +513,7 @@ export default function Home() {
               </motion.div>
             </div>
 
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[4/5] md:aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group">
               <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
               <motion.div style={{ y: optiImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
                 <Image src="/img-opti.webp" alt="Hardware Upgrade, ampliación SSD y memoria RAM" fill className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
@@ -437,11 +525,11 @@ export default function Home() {
       </section>
 
       {/* 7: DETALLE CCTV */}
-      <section id="detalle-cctv" ref={cctvRef} className="relative bg-[#050505] py-32 border-t border-zinc-900 z-30 overflow-hidden">
+      <section id="detalle-cctv" ref={cctvRef} className="relative bg-[#050505] py-20 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-24 items-center">
             
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[4/5] md:aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group">
               <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
               <motion.div style={{ y: cctvImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
                 <Image src="/img-camaras.webp" alt="Instalación de Cámaras de Seguridad CCTV y Videovigilancia" fill className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
@@ -485,7 +573,7 @@ export default function Home() {
       </section>
 
       {/* 8: PROCESO */}
-      <section id="proceso" className="relative bg-[#050505] py-32 border-t border-zinc-900 z-30">
+      <section id="proceso" className="relative bg-[#050505] py-20 lg:py-32 border-t border-zinc-900 z-30">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }} className="text-center mb-24">
@@ -501,8 +589,8 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="relative flex flex-col gap-24 pb-24">
-            <motion.article initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ margin: "-100px" }} transition={{ duration: 0.5 }} className="sticky top-[15vh] w-full border border-zinc-800 bg-[#0A0A0A] p-8 md:p-12 shadow-2xl flex flex-col md:flex-row gap-8 items-start md:items-center">
+          <div className="relative flex flex-col gap-16 md:gap-24 pb-24">
+            <motion.article initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ margin: "-100px" }} transition={{ duration: 0.5 }} className="sticky top-[12vh] md:top-[15vh] w-full border border-zinc-800 bg-[#0A0A0A] p-8 md:p-12 shadow-2xl flex flex-col md:flex-row gap-8 items-start md:items-center">
               <div className="md:w-1/3 flex flex-col">
                 <span className="text-7xl font-black text-zinc-800 font-mono leading-none mb-4">01</span>
                 <h3 className="text-2xl font-bold text-white uppercase tracking-widest">Diagnóstico</h3>
@@ -514,7 +602,7 @@ export default function Home() {
               </div>
             </motion.article>
 
-            <motion.article initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ margin: "-100px" }} transition={{ duration: 0.5 }} className="sticky top-[18vh] w-full border border-zinc-800 bg-[#0A0A0A] p-8 md:p-12 shadow-2xl flex flex-col md:flex-row gap-8 items-start md:items-center">
+            <motion.article initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ margin: "-100px" }} transition={{ duration: 0.5 }} className="sticky top-[15vh] md:top-[18vh] w-full border border-zinc-800 bg-[#0A0A0A] p-8 md:p-12 shadow-2xl flex flex-col md:flex-row gap-8 items-start md:items-center">
               <div className="md:w-1/3 flex flex-col">
                 <span className="text-7xl font-black text-zinc-800 font-mono leading-none mb-4">02</span>
                 <h3 className="text-2xl font-bold text-white uppercase tracking-widest">Propuesta</h3>
@@ -526,7 +614,7 @@ export default function Home() {
               </div>
             </motion.article>
 
-            <motion.article initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ margin: "-100px" }} transition={{ duration: 0.5 }} className="sticky top-[21vh] w-full border border-zinc-800 bg-[#0A0A0A] p-8 md:p-12 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] flex flex-col md:flex-row gap-8 items-start md:items-center">
+            <motion.article initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ margin: "-100px" }} transition={{ duration: 0.5 }} className="sticky top-[18vh] md:top-[21vh] w-full border border-zinc-800 bg-[#0A0A0A] p-8 md:p-12 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] flex flex-col md:flex-row gap-8 items-start md:items-center">
               <div className="md:w-1/3 flex flex-col">
                 <span className="text-7xl font-black text-[#E1F030] font-mono leading-none mb-4">03</span>
                 <h3 className="text-2xl font-bold text-white uppercase tracking-widest">Ejecución</h3>
@@ -542,7 +630,7 @@ export default function Home() {
       </section>
 
       {/* 9: REDES SOCIALES */}
-      <section id="sociales" className="relative bg-[#050505] py-32 border-t border-zinc-900 z-30 overflow-hidden">
+      <section id="sociales" className="relative bg-[#050505] py-20 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }} className="mb-16 md:mb-24">
@@ -601,7 +689,7 @@ export default function Home() {
       </section>
 
       {/* 10: FAQ */}
-      <section id="faq" className="relative bg-[#050505] py-32 border-t border-zinc-900 z-30">
+      <section id="faq" className="relative bg-[#050505] py-20 lg:py-32 border-t border-zinc-900 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-8 items-start">
             
@@ -633,7 +721,7 @@ export default function Home() {
       </section>
 
       {/* 11: CONTACTO / FORMULARIO */}
-      <section id="contacto" className="relative bg-[#050505] py-32 border-t border-zinc-900 z-30">
+      <section id="contacto" className="relative bg-[#050505] py-20 lg:py-32 border-t border-zinc-900 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
             
@@ -682,7 +770,7 @@ export default function Home() {
 
                 <div className="relative group">
                   <label htmlFor="servicio" className="sr-only">Seleccionar Servicio</label>
-                  <select id="servicio" name="servicio" required defaultValue="" className="w-full bg-transparent border-b border-zinc-800 py-4 text-zinc-400 font-mono text-sm focus:outline-none focus:border-white transition-colors appearance-none cursor-pointer">
+                  <select id="servicio" name="servicio" required defaultValue="" className="w-full bg-[#0A0A0A] border-b border-zinc-800 py-4 text-zinc-400 font-mono text-sm focus:outline-none focus:border-white transition-colors appearance-none cursor-pointer">
                     <option value="" disabled hidden>Seleccioná un servicio...</option>
                     <option value="desarrollo" className="bg-[#0A0A0A] text-white">Desarrollo Web / Páginas</option>
                     <option value="mantenimiento" className="bg-[#0A0A0A] text-white">Reparación de PC</option>
@@ -775,7 +863,7 @@ export default function Home() {
       </footer>
 
       {/* BOTONES FLOTANTES */}
-      <div className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50 flex flex-col gap-4 items-center pointer-events-none">
+      <div className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50 flex flex-col gap-4 items-center pointer-events-none pb-[max(0px,env(safe-area-inset-bottom))]">
         
         <button 
           onClick={volverArriba} 
@@ -800,5 +888,6 @@ export default function Home() {
       </div>
 
     </main>
+    </MotionConfig>
   );
 }
