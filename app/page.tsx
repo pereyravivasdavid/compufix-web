@@ -41,6 +41,52 @@ const FaqItem = ({ pregunta, respuesta }: { pregunta: string, respuesta: string 
   );
 };
 
+// Componente Text Carousel (estilo Originkit)
+const PALABRAS_ROTATIVAS = ["Desarrollo", "Hardware", "Seguridad"];
+
+const TextCarousel = () => {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => setIndex((i) => (i + 1) % PALABRAS_ROTATIVAS.length), 2800);
+    return () => clearInterval(timer);
+  }, []);
+
+  const palabra = PALABRAS_ROTATIVAS[index];
+
+  return (
+    <motion.span
+      className="relative inline-flex items-center justify-center border border-zinc-800 bg-white w-[260px] sm:w-[300px] md:w-[420px] lg:w-[560px] py-3 md:py-4 shadow-[4px_4px_0px_#18181b]"
+    >
+      <span className="sr-only">{palabra}</span>
+      <AnimatePresence mode="popLayout" initial={false}>
+        <motion.span
+          key={palabra}
+          className="inline-block overflow-hidden whitespace-nowrap"
+          variants={{ enter: {}, center: {}, exit: {} }}
+          initial="enter"
+          animate="center"
+          exit="exit"
+        >
+          {palabra.split("").map((letra, i) => (
+            <motion.span
+              key={`${palabra}-${i}`}
+              variants={{
+                enter: { y: "110%", opacity: 0 },
+                center: { y: "0%", opacity: 1, transition: { duration: 0.4, ease: "easeOut", delay: i * 0.035 } },
+                exit: { y: "-110%", opacity: 0, transition: { duration: 0.3, ease: "easeIn", delay: i * 0.025 } },
+              }}
+              className="inline-block text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter text-black"
+            >
+              {letra}
+            </motion.span>
+          ))}
+        </motion.span>
+      </AnimatePresence>
+    </motion.span>
+  );
+};
+
 export default function Home() {
   // ---------------------------------------------------
   // ESTADOS GLOBALES
@@ -79,12 +125,6 @@ export default function Home() {
   // ---------------------------------------------------
   // FÍSICAS DE SCROLL
   // ---------------------------------------------------
-  const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: heroProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const heroScale = useTransform(heroProgress, [0, 1], [1, 0.60]);
-  const heroOpacity = useTransform(heroProgress, [0, 0.5, 1], [1, 1, 0]);
-  const heroTextY = useTransform(heroProgress, [0, 1], ["0%", "80%"]);
-
   const horizontalRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress: horizontalProgress } = useScroll({ target: horizontalRef, offset: ["start start", "end end"] });
   const smoothProgress = useSpring(horizontalProgress, { stiffness: 200, damping: 25, mass: 0.1 });
@@ -200,36 +240,41 @@ export default function Home() {
       </AnimatePresence>
 
       {/* 1: HERO */}
-      <section id="inicio" ref={heroRef} className="relative h-[150vh] bg-black">
-        <motion.div 
-          style={{ scale: heroScale, opacity: heroOpacity }}
-          className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-[#050505] origin-top"
+      <section id="inicio" className="relative h-screen min-h-[620px] bg-[#050505] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:24px_24px] opacity-30"></div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="relative z-10 text-center px-4 flex flex-col items-center"
         >
-          <div className="absolute inset-0 bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:24px_24px] opacity-30"></div>
+          <div className="inline-flex items-center gap-4 px-4 py-2 border border-zinc-800 bg-black mb-8 shadow-[4px_4px_0px_#18181b]">
+            <span className="w-2 h-2 bg-white"></span>
+            <span className="text-[10px] sm:text-xs font-mono text-zinc-400 uppercase tracking-widest">
+              Presidencia Roque Sáenz Peña, Chaco
+            </span>
+          </div>
 
-          <motion.div style={{ y: heroTextY }} className="relative z-10 text-center px-4 flex flex-col items-center">
-            <div className="inline-flex items-center gap-4 px-4 py-2 border border-zinc-800 bg-black mb-8 shadow-[4px_4px_0px_#18181b]">
-              <span className="w-2 h-2 bg-white"></span>
-              <span className="text-[10px] sm:text-xs font-mono text-zinc-400 uppercase tracking-widest">
-                Presidencia Roque Sáenz Peña, Chaco
-              </span>
-            </div>
+          <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase leading-[0.85] mb-10">
+            Compufix
+            <span className="text-zinc-600">.sp</span>
+          </h1>
 
-            <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase leading-[0.85] mb-8">
-              Compufix <br />
-              <span className="text-zinc-600">sp</span>
-            </h1>
+          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 mb-14">
+            <span className="text-sm md:text-xl font-mono text-zinc-500 uppercase tracking-widest">
+              Especialistas en
+            </span>
+            <TextCarousel />
+          </div>
 
-            <h2 className="text-lg md:text-xl font-mono text-zinc-400 mb-12 max-w-2xl mx-auto leading-relaxed font-normal">
-              Especialistas en <strong>desarrollo web de alto rendimiento, reparación de PCs e instalación de cámaras CCTV</strong> . Soluciones técnicas integrales y sin vueltas.
-            </h2>
-            
-            <div className="animate-pulse">
-              <span className="text-xs font-mono text-zinc-600 uppercase tracking-widest border border-zinc-800 px-6 py-3 bg-black">
-                Explorar Servicios ↓
-              </span>
-            </div>
-          </motion.div>
+          <a
+            href="#servicios"
+            className="group inline-flex items-center gap-4 bg-[#E1F030] text-black px-8 py-4 text-sm font-mono uppercase tracking-widest font-bold border-2 border-[#E1F030] hover:bg-black hover:text-[#E1F030] transition-all duration-300 shadow-[6px_6px_0px_0px_rgba(225,240,48,0.35)] hover:shadow-[6px_6px_0px_0px_#E1F030]"
+          >
+            <span>Explorar Servicios</span>
+            <svg className="w-4 h-4 group-hover:translate-y-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+          </a>
         </motion.div>
       </section>
 
