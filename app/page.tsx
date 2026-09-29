@@ -279,7 +279,7 @@ export default function Home() {
       </section>
 
       {/* 2: SERVICIOS */}
-      <section id="servicios" ref={horizontalRef} className="relative h-[600vh] bg-[#050505] z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.8)] border-t border-zinc-900">
+      <section id="servicios" ref={horizontalRef} className="relative h-[300vh] lg:h-[600vh] bg-[#050505] z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.8)] border-t border-zinc-900">
         <div className="sticky top-0 h-screen flex flex-col justify-end md:justify-center pb-12 md:pb-0 overflow-hidden">
           
           <div className="absolute left-6 md:left-12 top-28 md:top-32 z-0 pointer-events-none">
@@ -350,9 +350,10 @@ export default function Home() {
                   className="relative w-full h-full"
                 >
                   <Image 
-                    src="/logo-compufix.webp" 
-                    alt="Logotipo de Compufix SP, especialistas en tecnología" 
-                    fill 
+                    src="/logo-compufix.webp"
+                    alt="Logotipo de Compufix SP, especialistas en tecnología"
+                    fill
+                    sizes="280px" 
                     className="object-contain opacity-90 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]"
                   />
                 </motion.div>
@@ -418,10 +419,13 @@ export default function Home() {
 
       {/* 4: DETALLE DESARROLLO */}
       <section id="detalle-desarrollo" ref={desarrolloRef} className="relative bg-[#050505] py-20 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
+        <div aria-hidden="true" className="lg:hidden absolute inset-x-0 top-20 z-0 flex justify-center pointer-events-none select-none overflow-hidden">
+          <span className="text-[24vw] font-black uppercase tracking-tighter text-zinc-900/40 whitespace-nowrap leading-none">Desarrollo</span>
+        </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-24 items-center">
             
-            <div className="flex flex-col justify-center order-2 lg:order-1">
+            <div className="flex flex-col justify-center order-2 lg:order-1 relative z-10 -mt-24 lg:mt-0 bg-[#0A0A0A]/95 lg:bg-transparent backdrop-blur-sm border border-zinc-900 lg:border-0 p-6 md:p-10 lg:p-0 shadow-2xl lg:shadow-none">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
                 <div className="flex items-center gap-3 mb-6">
                   <span className="w-2 h-2 bg-white"></span>
@@ -461,10 +465,10 @@ export default function Home() {
               </motion.div>
             </div>
 
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group translate-x-[-5%] translate-y-[3%] lg:translate-x-0 lg:translate-y-0">
               <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
               <motion.div style={{ y: devImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
-                <Image src="/desarrollo-nuevo.webp" alt="Programación y Diseño de Sistemas Web a Medida" fill className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
+                <Image src="/desarrollo-nuevo.webp" alt="Programación y Diseño de Sistemas Web a Medida" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
               </motion.div>
             </motion.div>
 
@@ -474,17 +478,20 @@ export default function Home() {
 
       {/* 5: DETALLE MANTENIMIENTO */}
       <section id="detalle-mantenimiento" ref={mantenimientoRef} className="relative bg-[#050505] py-20 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
+        <div aria-hidden="true" className="lg:hidden absolute inset-x-0 top-20 z-0 flex justify-center pointer-events-none select-none overflow-hidden">
+          <span className="text-[24vw] font-black uppercase tracking-tighter text-zinc-900/40 whitespace-nowrap leading-none">Hardware</span>
+        </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-24 items-center">
             
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group translate-x-[5%] translate-y-[3%] lg:translate-x-0 lg:translate-y-0">
               <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
               <motion.div style={{ y: mantImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
-                <Image src="/img-reparacion.webp" alt="Servicio Técnico, Mantenimiento y Reparación de PC en Chaco" fill className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
+                <Image src="/img-reparacion.webp" alt="Servicio Técnico, Mantenimiento y Reparación de PC en Chaco" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
               </motion.div>
             </motion.div>
 
-            <div className="flex flex-col justify-center order-2">
+            <div className="flex flex-col justify-center order-2 relative z-10 -mt-24 lg:mt-0 bg-[#0A0A0A]/95 lg:bg-transparent backdrop-blur-sm border border-zinc-900 lg:border-0 p-6 md:p-10 lg:p-0 shadow-2xl lg:shadow-none">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
                 <div className="flex items-center gap-3 mb-6">
                   <span className="w-2 h-2 bg-white"></span>
@@ -522,10 +529,13 @@ export default function Home() {
 
       {/* 6: DETALLE OPTIMIZACIÓN */}
       <section id="detalle-optimizacion" ref={optimizacionRef} className="relative bg-[#050505] py-20 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
+        <div aria-hidden="true" className="lg:hidden absolute inset-x-0 top-20 z-0 flex justify-center pointer-events-none select-none overflow-hidden">
+          <span className="text-[24vw] font-black uppercase tracking-tighter text-zinc-900/40 whitespace-nowrap leading-none">Upgrade</span>
+        </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-24 items-center">
             
-            <div className="flex flex-col justify-center order-2 lg:order-1">
+            <div className="flex flex-col justify-center order-2 lg:order-1 relative z-10 -mt-24 lg:mt-0 bg-[#0A0A0A]/95 lg:bg-transparent backdrop-blur-sm border border-zinc-900 lg:border-0 p-6 md:p-10 lg:p-0 shadow-2xl lg:shadow-none">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
                 <div className="flex items-center gap-3 mb-6">
                   <span className="w-2 h-2 bg-white"></span>
@@ -558,10 +568,10 @@ export default function Home() {
               </motion.div>
             </div>
 
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group translate-x-[-5%] translate-y-[3%] lg:translate-x-0 lg:translate-y-0">
               <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
               <motion.div style={{ y: optiImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
-                <Image src="/img-opti.webp" alt="Hardware Upgrade, ampliación SSD y memoria RAM" fill className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
+                <Image src="/img-opti.webp" alt="Hardware Upgrade, ampliación SSD y memoria RAM" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
               </motion.div>
             </motion.div>
 
@@ -571,17 +581,20 @@ export default function Home() {
 
       {/* 7: DETALLE CCTV */}
       <section id="detalle-cctv" ref={cctvRef} className="relative bg-[#050505] py-20 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
+        <div aria-hidden="true" className="lg:hidden absolute inset-x-0 top-20 z-0 flex justify-center pointer-events-none select-none overflow-hidden">
+          <span className="text-[24vw] font-black uppercase tracking-tighter text-zinc-900/40 whitespace-nowrap leading-none">Seguridad</span>
+        </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-24 items-center">
             
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group translate-x-[5%] translate-y-[3%] lg:translate-x-0 lg:translate-y-0">
               <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
               <motion.div style={{ y: cctvImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
-                <Image src="/img-camaras.webp" alt="Instalación de Cámaras de Seguridad CCTV y Videovigilancia" fill className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
+                <Image src="/img-camaras.webp" alt="Instalación de Cámaras de Seguridad CCTV y Videovigilancia" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
               </motion.div>
             </motion.div>
 
-            <div className="flex flex-col justify-center order-2">
+            <div className="flex flex-col justify-center order-2 relative z-10 -mt-24 lg:mt-0 bg-[#0A0A0A]/95 lg:bg-transparent backdrop-blur-sm border border-zinc-900 lg:border-0 p-6 md:p-10 lg:p-0 shadow-2xl lg:shadow-none">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
                 <div className="flex items-center gap-3 mb-6">
                   <span className="w-2 h-2 bg-white"></span>
@@ -754,7 +767,8 @@ export default function Home() {
             </div>
 
             <div className="lg:col-span-8 flex flex-col border-t border-zinc-900">
-              <FaqItem pregunta="¿Tienen garantía los mantenimientos de PC?" respuesta="Absolutamente. Todos nuestros trabajos de reparación de hardware, limpieza física y actualizaciones SSD/RAM cuentan con garantía escrita." />
+              <FaqItem pregunta="¿Tienen garantía los mantenimientos de PC?" respuesta="Si, Todos nuestros trabajos de reparación de hardware, limpieza física y actualizaciones SSD/RAM cuentan con garantía." />
+              <FaqItem pregunta="¿Si reparan u optimizan mi equipo, pierdo mis archivos y documentos?" respuesta="Para nada. Siempre realizamos copias de seguridad antes de modificar algo, de esta manera tu información está segura." />
               <FaqItem pregunta="¿El servicio de desarrollo web aplica fuera del Chaco?" respuesta="Sí, el área de Sistemas Web funciona 100% online. Desarrollamos páginas para clientes de todo Argentina mediante metodologías ágiles a distancia." />
               <FaqItem pregunta="¿Qué necesito para cotizar la instalación de cámaras CCTV?" respuesta="Basta con comunicarte al WhatsApp. Evaluamos la cobertura necesaria de tu domicilio o negocio y preparamos un presupuesto de videovigilancia a medida." />
               <FaqItem pregunta="¿Venden equipos informáticos nuevos?" respuesta="Nos centramos en la reparación de PC, optimización y montaje técnico de equipos armados bajo pedido, ya sea para oficina, diseño gráfico o gaming." />
