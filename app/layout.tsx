@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
+import FloatingActions from "@/components/FloatingActions";
 import "./globals.css";
 
 // Configuración de la tipografía principal
@@ -34,6 +35,7 @@ export default function RootLayout({
     <html lang="es" className="scroll-smooth">
       <body className={`${roboto.className} antialiased text-gray-900 bg-white`}>
         {children}
+        <FloatingActions />
       </body>
     </html>
   );

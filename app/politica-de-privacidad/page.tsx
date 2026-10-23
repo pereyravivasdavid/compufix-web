@@ -59,7 +59,14 @@ export default function PoliticaDePrivacidad() {
             </p>
 
             <h2 className="text-xl font-bold text-white uppercase tracking-widest mt-12 mb-4 flex items-center gap-3">
-              <span className="text-zinc-600">/</span> 4. Contacto
+              <span className="text-zinc-600">/</span> 4. Chat del sitio
+            </h2>
+            <p>
+              El asistente virtual del sitio ofrece respuestas automáticas sobre nuestros servicios y no almacena el contenido de la conversación. Si elegís continuar por WhatsApp, la comunicación se rige por las políticas de privacidad de esa plataforma.
+            </p>
+
+            <h2 className="text-xl font-bold text-white uppercase tracking-widest mt-12 mb-4 flex items-center gap-3">
+              <span className="text-zinc-600">/</span> 5. Contacto
             </h2>
             <p>
               Si tenés alguna duda sobre el manejo de tus datos, podés escribirnos directamente a nuestro correo electrónico o contactarnos vía WhatsApp.
