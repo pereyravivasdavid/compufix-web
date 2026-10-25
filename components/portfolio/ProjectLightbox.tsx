@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import type { ProjectImage } from "@/lib/projects";
+import type { ProjectMedia } from "@/lib/projects";
 
 function Flecha({ invertida }: { invertida?: boolean }) {
   return (
@@ -23,8 +24,18 @@ function Flecha({ invertida }: { invertida?: boolean }) {
   );
 }
 
+function urlEmbed(url: string) {
+  const limpia = url.split("?")[0].replace(/\/+$/, "");
+  const coincidencia = limpia.match(
+    /instagram\.com\/(?:reel|reels|p|tv)\/([A-Za-z0-9_-]+)/,
+  );
+  return coincidencia
+    ? `https://www.instagram.com/reel/${coincidencia[1]}/embed/`
+    : limpia;
+}
+
 export default function ProjectLightbox({
-  images,
+  media,
   index,
   label,
   open,
@@ -32,7 +43,7 @@ export default function ProjectLightbox({
   onClose,
   format = "desktop",
 }: {
-  images: ProjectImage[];
+  media: ProjectMedia[];
   index: number;
   label: string;
   open: boolean;
@@ -40,8 +51,10 @@ export default function ProjectLightbox({
   onClose: () => void;
   format?: "desktop" | "mobile";
 }) {
-  const total = images.length;
+  const total = media.length;
   const esMovil = format === "mobile";
+  const medio = media[index];
+  const esReel = medio?.kind === "reel";
 
   useEffect(() => {
     if (!open) return;
@@ -66,15 +79,15 @@ export default function ProjectLightbox({
     };
   }, [open, index, total, onChange, onClose]);
 
-  const imagen = images[index];
-
-  return (
+  const contenido = (
     <AnimatePresence>
-      {open && imagen && (
+      {open && medio && (
         <motion.div
           role="dialog"
           aria-modal="true"
-          aria-label={`Captura ampliada de ${label}`}
+          aria-label={
+            esReel ? `Reel de ${label}` : `Captura ampliada de ${label}`
+          }
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -86,7 +99,7 @@ export default function ProjectLightbox({
             type="button"
             onClick={onClose}
             aria-label="Cerrar captura ampliada"
-            className="absolute top-4 right-4 md:top-6 md:right-6 w-11 h-11 flex items-center justify-center border border-zinc-700 text-zinc-300 hover:border-white hover:text-white transition-colors"
+            className="absolute top-3 right-3 md:top-6 md:right-6 z-30 w-11 h-11 flex items-center justify-center rounded-full border border-white/25 bg-black/80 text-white shadow-lg backdrop-blur-sm hover:bg-black hover:border-white transition-colors"
           >
             <svg
               className="w-5 h-5"
@@ -108,20 +121,47 @@ export default function ProjectLightbox({
             exit={{ scale: 0.96, y: 12 }}
             transition={{ duration: 0.22, ease: "easeOut" }}
             onClick={(evento) => evento.stopPropagation()}
-            className={`relative bg-[#0A0A0A] border border-zinc-800 ${
-              esMovil
-                ? "h-[85vh] max-w-[92vw] aspect-[1080/2340]"
-                : "w-full max-w-6xl aspect-[16/10]"
+            className={`relative ${
+              esReel
+                ? "w-[min(92vw,47.8125vh)] aspect-[9/16] bg-black"
+                : esMovil
+                  ? "h-[85vh] max-w-[92vw] aspect-[1080/2340] bg-[#0A0A0A] border border-zinc-800"
+                  : "w-full max-w-6xl aspect-[16/10] bg-[#0A0A0A] border border-zinc-800"
             }`}
           >
-            <Image
-              src={imagen.src}
-              alt={imagen.alt}
-              fill
-              sizes="95vw"
-              className="object-contain"
-            />
+            {medio.kind === "reel" ? (
+              <iframe
+                key={medio.src}
+                src={urlEmbed(medio.src)}
+                title={`Reel de ${label}`}
+                className="absolute inset-0 h-full w-full"
+                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="strict-origin-when-cross-origin"
+              />
+            ) : (
+              <Image
+                src={medio.src}
+                alt={medio.alt}
+                fill
+                sizes="95vw"
+                className="object-contain"
+              />
+            )}
           </motion.div>
+
+          {medio.kind === "reel" && (
+            <a
+              href={medio.src}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(evento) => evento.stopPropagation()}
+              className="absolute bottom-4 right-4 md:bottom-6 md:right-6 text-[10px] font-mono uppercase tracking-widest text-zinc-400 hover:text-[#E1F030] border-b border-zinc-700 hover:border-[#E1F030] pb-0.5 transition-colors"
+            >
+              Ver en Instagram
+            </a>
+          )}
 
           <button
             type="button"
@@ -154,4 +194,8 @@ export default function ProjectLightbox({
       )}
     </AnimatePresence>
   );
+
+  if (typeof document === "undefined") return null;
+
+  return createPortal(contenido, document.body);
 }

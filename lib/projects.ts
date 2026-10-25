@@ -1,7 +1,17 @@
 export type ProjectImage = {
+  kind: "image";
   src: string;
   alt: string;
 };
+
+export type ProjectReel = {
+  kind: "reel";
+  src: string;
+  poster: string;
+  alt: string;
+};
+
+export type ProjectMedia = ProjectImage | ProjectReel;
 
 export type ProjectFormat = "desktop" | "mobile";
 
@@ -15,11 +25,16 @@ export type Project = {
   features: string[];
   status: string;
   format: ProjectFormat;
-  images: ProjectImage[];
+  media: ProjectMedia[];
 };
 
-function capturas(base: string, archivos: string[], etiqueta: string): ProjectImage[] {
+function capturas(
+  base: string,
+  archivos: string[],
+  etiqueta: string,
+): ProjectImage[] {
   return archivos.map((archivo, i) => ({
+    kind: "image",
     src: `${base}/${archivo}`,
     alt: `${etiqueta} - captura ${i + 1}`,
   }));
@@ -43,24 +58,32 @@ export const PROJECTS: Project[] = [
     ],
     status: "Proyecto a medida",
     format: "desktop",
-    images: capturas(
-      "/portfolio/centerfitness",
-      [
-        "1.png",
-        "2.png",
-        "3.png",
-        "4.png",
-        "5.png",
-        "6.png",
-        "7.png",
-        "9.webp",
-        "10.png",
-        "gym_acceso.png",
-        "gym_ok.png",
-        "gym_rojo.webp",
-      ],
-      "Centerfitness",
-    ),
+    media: [
+      {
+        kind: "reel",
+        src: "https://www.instagram.com/reels/DZEQLQYsHNM/",
+        poster: "/portfolio/centerfitness/reel-cover.jpg",
+        alt: "Reel de Gestión de miembros GYM",
+      },
+      ...capturas(
+        "/portfolio/centerfitness",
+        [
+          "1.png",
+          "2.png",
+          "3.png",
+          "4.png",
+          "5.png",
+          "6.png",
+          "7.png",
+          "9.webp",
+          "10.png",
+          "gym_acceso.png",
+          "gym_ok.png",
+          "gym_rojo.webp",
+        ],
+        "Centerfitness",
+      ),
+    ],
   },
   {
     id: "froxi-pos",
@@ -78,7 +101,7 @@ export const PROJECTS: Project[] = [
     ],
     status: "Software a medida",
     format: "desktop",
-    images: capturas(
+    media: capturas(
       "/portfolio/froxi-pos",
       ["1.webp", "2.webp", "3.webp", "4.webp", "5.webp", "6.webp"],
       "Froxi-POS",
@@ -101,7 +124,7 @@ export const PROJECTS: Project[] = [
     ],
     status: "Software a medida",
     format: "desktop",
-    images: capturas(
+    media: capturas(
       "/portfolio/sistema-vales",
       [
         "1.webp",
@@ -133,7 +156,7 @@ export const PROJECTS: Project[] = [
     ],
     status: "A medida",
     format: "mobile",
-    images: capturas(
+    media: capturas(
       "/portfolio/stoxito",
       ["1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg"],
       "Stoxito",

@@ -119,7 +119,7 @@ export default function ProjectSection({
             className={`lg:col-span-7 ${reverse ? "lg:order-1" : ""}`}
           >
             <ProjectCarousel
-              images={project.images}
+              media={project.media}
               label={project.name}
               format={project.format}
             />

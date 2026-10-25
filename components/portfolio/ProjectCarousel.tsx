@@ -8,7 +8,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import type { ProjectImage } from "@/lib/projects";
+import type { ProjectMedia } from "@/lib/projects";
 import ProjectLightbox from "./ProjectLightbox";
 
 function IconoFlecha({ direccion }: { direccion: "izquierda" | "derecha" }) {
@@ -29,12 +29,31 @@ function IconoFlecha({ direccion }: { direccion: "izquierda" | "derecha" }) {
   );
 }
 
+function IconoInstagram() {
+  return (
+    <svg
+      className="w-3 h-3"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 export default function ProjectCarousel({
-  images,
+  media,
   label,
   format = "desktop",
 }: {
-  images: ProjectImage[];
+  media: ProjectMedia[];
   label: string;
   format?: "desktop" | "mobile";
 }) {
@@ -47,7 +66,7 @@ export default function ProjectCarousel({
   const inicio = useRef<{ x: number; y: number } | null>(null);
   const arrastrado = useRef(false);
 
-  const total = images.length;
+  const total = media.length;
 
   const anterior = useCallback(
     () => setIndex((actual) => (actual - 1 + total) % total),
@@ -128,21 +147,27 @@ export default function ProjectCarousel({
           }`}
           style={{ perspective: "1600px" }}
         >
-          {images.map((imagen, i) => {
+          {media.map((item, i) => {
             const offset = i - index;
             const distancia = Math.abs(offset);
             const visible = distancia <= 2;
             const activo = offset === 0;
+            const esReel = item.kind === "reel";
+            const poster = esReel ? item.poster : item.src;
 
             return (
               <motion.button
-                key={imagen.src}
+                key={`${item.kind}-${i}`}
                 type="button"
                 onClick={() => abrirLightbox(i)}
                 aria-label={
-                  activo
-                    ? `Ampliar captura ${i + 1} de ${total}`
-                    : `Ver captura ${i + 1} de ${total}`
+                  esReel
+                    ? activo
+                      ? `Reproducir reel de ${label}`
+                      : `Ver reel de ${label}`
+                    : activo
+                      ? `Ampliar captura ${i + 1} de ${total}`
+                      : `Ver captura ${i + 1} de ${total}`
                 }
                 aria-hidden={!visible}
                 tabIndex={activo ? 0 : -1}
@@ -170,8 +195,8 @@ export default function ProjectCarousel({
                 }`}
               >
                 <Image
-                  src={imagen.src}
-                  alt={imagen.alt}
+                  src={poster}
+                  alt={item.alt}
                   fill
                   sizes={
                     esMovil
@@ -181,6 +206,27 @@ export default function ProjectCarousel({
                   className="object-contain"
                   draggable={false}
                 />
+
+                {esReel && (
+                  <>
+                    <span className="pointer-events-none absolute left-3 top-3 flex items-center gap-1.5 border border-white/20 bg-black/60 px-2 py-1 text-[9px] font-mono uppercase tracking-widest text-white/90 backdrop-blur-sm">
+                      <IconoInstagram />
+                      Reel
+                    </span>
+                    <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                      <span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/30 bg-black/55 text-white backdrop-blur-sm md:h-16 md:w-16">
+                        <svg
+                          className="w-5 h-5 translate-x-0.5"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </span>
+                    </span>
+                  </>
+                )}
               </motion.button>
             );
           })}
@@ -222,11 +268,11 @@ export default function ProjectCarousel({
       </div>
 
       <p className="mt-3 text-[10px] font-mono uppercase tracking-widest text-zinc-600">
-        Deslizá o usá las flechas · tocá para ampliar
+        Deslizá o usá las flechas · tocá para abrir
       </p>
 
       <ProjectLightbox
-        images={images}
+        media={media}
         index={index}
         label={label}
         open={lightboxAbierto}
