@@ -458,7 +458,7 @@ export default function Home() {
               </motion.div>
             </div>
 
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group translate-x-[-5%] translate-y-[3%] lg:translate-x-0 lg:translate-y-0">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full max-w-[28rem] mx-auto aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group translate-x-[-5%] translate-y-[3%] lg:translate-x-0 lg:translate-y-0">
               <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
               <motion.div style={{ y: devImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
                 <Image src="/desarrollo-nuevo.webp" alt="Programación y Diseño de Sistemas Web a Medida" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
@@ -477,7 +477,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-24 items-center">
             
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group translate-x-[5%] translate-y-[3%] lg:translate-x-0 lg:translate-y-0">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full max-w-[28rem] mx-auto aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group translate-x-[5%] translate-y-[3%] lg:translate-x-0 lg:translate-y-0">
               <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
               <motion.div style={{ y: mantImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
                 <Image src="/img-reparacion.webp" alt="Servicio Técnico, Mantenimiento y Reparación de PC en Chaco" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
@@ -561,7 +561,7 @@ export default function Home() {
               </motion.div>
             </div>
 
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group translate-x-[-5%] translate-y-[3%] lg:translate-x-0 lg:translate-y-0">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full max-w-[28rem] mx-auto aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group translate-x-[-5%] translate-y-[3%] lg:translate-x-0 lg:translate-y-0">
               <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
               <motion.div style={{ y: optiImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
                 <Image src="/img-opti.webp" alt="Hardware Upgrade, ampliación SSD y memoria RAM" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
@@ -580,7 +580,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-24 items-center">
             
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group translate-x-[5%] translate-y-[3%] lg:translate-x-0 lg:translate-y-0">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full max-w-[28rem] mx-auto aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group translate-x-[5%] translate-y-[3%] lg:translate-x-0 lg:translate-y-0">
               <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
               <motion.div style={{ y: cctvImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
                 <Image src="/img-camaras.webp" alt="Instalación de Cámaras de Seguridad CCTV y Videovigilancia" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
