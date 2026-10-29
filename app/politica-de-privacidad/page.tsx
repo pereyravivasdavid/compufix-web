@@ -66,7 +66,35 @@ export default function PoliticaDePrivacidad() {
             </p>
 
             <h2 className="text-xl font-bold text-white uppercase tracking-widest mt-12 mb-4 flex items-center gap-3">
-              <span className="text-zinc-600">/</span> 5. Contacto
+              <span className="text-zinc-600">/</span> 5. Analítica web
+            </h2>
+            <p>
+              Utilizamos Google Analytics 4, un servicio de Google LLC, para conocer la cantidad de visitas, el origen del tráfico, el país y el dispositivo desde el que se accede al sitio. Google puede procesar datos como la dirección IP y cookies propias, y transferirlos a servidores ubicados fuera de Argentina. No usamos esta información para identificarte personalmente ni con fines publicitarios.
+            </p>
+            <p>
+              Podés impedir que Google Analytics registre tu visita instalando el{" "}
+              <a
+                href="https://tools.google.com/dlpage/gaoptout"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white underline underline-offset-4 hover:text-[#E1F030] transition-colors"
+              >
+                complemento de inhabilitación de Google Analytics
+              </a>
+              . Para más información, consultá la{" "}
+              <a
+                href="https://policies.google.com/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white underline underline-offset-4 hover:text-[#E1F030] transition-colors"
+              >
+                política de privacidad de Google
+              </a>
+              .
+            </p>
+
+            <h2 className="text-xl font-bold text-white uppercase tracking-widest mt-12 mb-4 flex items-center gap-3">
+              <span className="text-zinc-600">/</span> 6. Contacto
             </h2>
             <p>
               Si tenés alguna duda sobre el manejo de tus datos, podés escribirnos directamente a nuestro correo electrónico o contactarnos vía WhatsApp.

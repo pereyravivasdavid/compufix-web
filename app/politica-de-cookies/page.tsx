@@ -43,7 +43,7 @@ export default function PoliticaDeCookies() {
             </h2>
             <ul className="list-disc pl-6 space-y-2">
               <li><strong className="text-white font-normal">Cookies técnicas:</strong> Son esenciales para que la página funcione bien, como por ejemplo, recordar si ya cerraste un aviso o mantener la navegación fluida.</li>
-              <li><strong className="text-white font-normal">Cookies de análisis:</strong> Nos permiten medir el tráfico de la web de forma anónima, para saber qué secciones (como el servicio de mantenimiento o el de desarrollo web) son las más visitadas y así mejorar nuestro contenido.</li>
+              <li><strong className="text-white font-normal">Cookies de análisis (Google Analytics 4):</strong> Utilizamos Google Analytics 4 para medir la cantidad de visitas, el origen del tráfico, el país y el dispositivo desde el que nos visitás. Esta herramienta instala cookies propias (como <span className="text-white">_ga</span> y <span className="text-white">_ga_*</span>) que pueden durar hasta 2 años y generan un identificador anónimo. No la usamos para identificarte personalmente ni con fines publicitarios.</li>
             </ul>
 
             <h2 className="text-xl font-bold text-white uppercase tracking-widest mt-12 mb-4 flex items-center gap-3">
@@ -51,6 +51,27 @@ export default function PoliticaDeCookies() {
             </h2>
             <p>
               La mayoría de los navegadores aceptan estas tecnologías por defecto. Sin embargo, podés configurar tu navegador en cualquier momento para bloquearlas o eliminar las cookies ya guardadas desde el menú de ajustes de privacidad de tu dispositivo.
+            </p>
+            <p>
+              Si querés impedir específicamente que Google Analytics registre tu visita, podés instalar el{" "}
+              <a
+                href="https://tools.google.com/dlpage/gaoptout"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white underline underline-offset-4 hover:text-[#E1F030] transition-colors"
+              >
+                complemento de inhabilitación de Google Analytics
+              </a>
+              . También podés consultar la{" "}
+              <a
+                href="https://policies.google.com/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white underline underline-offset-4 hover:text-[#E1F030] transition-colors"
+              >
+                política de privacidad de Google
+              </a>
+              .
             </p>
           </div>
         </div>
