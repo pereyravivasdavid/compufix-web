@@ -42,7 +42,7 @@ const FaqItem = ({ pregunta, respuesta }: { pregunta: string, respuesta: string 
 };
 
 // Componente Text Carousel (estilo Originkit)
-const PALABRAS_ROTATIVAS = ["Desarrollo", "Hardware", "Seguridad"];
+const PALABRAS_ROTATIVAS = ["Desarrollo", "Hardware", "Redes", "Seguridad"];
 
 const TextCarousel = () => {
   const [index, setIndex] = useState(0);
@@ -127,13 +127,13 @@ export default function Home() {
   const { scrollYProgress: devProgress } = useScroll({ target: desarrolloRef, offset: ["start end", "end start"] });
   const devImageY = useTransform(devProgress, [0, 1], ["-20%", "20%"]);
 
-  const mantenimientoRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: mantProgress } = useScroll({ target: mantenimientoRef, offset: ["start end", "end start"] });
-  const mantImageY = useTransform(mantProgress, [0, 1], ["-20%", "20%"]);
+  const servicioTecnicoRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: tecnicoProgress } = useScroll({ target: servicioTecnicoRef, offset: ["start end", "end start"] });
+  const tecnicoImageY = useTransform(tecnicoProgress, [0, 1], ["-20%", "20%"]);
 
-  const optimizacionRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: optiProgress } = useScroll({ target: optimizacionRef, offset: ["start end", "end start"] });
-  const optiImageY = useTransform(optiProgress, [0, 1], ["-20%", "20%"]);
+  const starlinkRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: starlinkProgress } = useScroll({ target: starlinkRef, offset: ["start end", "end start"] });
+  const starlinkImageY = useTransform(starlinkProgress, [0, 1], ["-20%", "20%"]);
 
   const cctvRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress: cctvProgress } = useScroll({ target: cctvRef, offset: ["start end", "end start"] });
@@ -287,8 +287,8 @@ export default function Home() {
           <motion.div style={{ x }} className="flex gap-6 md:gap-12 pl-[7.5vw] md:pl-[30vw] items-center relative z-10 w-fit">
             {[
               { num: "01", titulo: "Desarrollo Web", desc: "Sistemas a medida, landing pages de alta conversión y plataformas robustas creadas con las últimas tecnologías.", link: "#detalle-desarrollo" },
-              { num: "02", titulo: "Mantenimiento PC", desc: "Diagnóstico, limpieza física profunda y solución a fallas de hardware para garantizar rendimiento y vida útil.", link: "#detalle-mantenimiento" },
-              { num: "03", titulo: "Hardware Upgrade", desc: "Ampliación de RAM, clonación a discos sólidos (SSD) y asesoramiento técnico especializado para revivir equipos.", link: "#detalle-optimizacion" },
+              { num: "02", titulo: "Servicio Técnico Integral", desc: "Diagnóstico, reparación y mantenimiento de PC, más upgrades de SSD y RAM para recuperar rendimiento sin cambiar de equipo.", link: "#detalle-servicio-tecnico" },
+              { num: "03", titulo: "Starlink y Redes", desc: "Instalación de antena Starlink, configuración de router y WiFi, redes cableadas y repetidores para una conexión estable.", link: "#detalle-starlink" },
               { num: "04", titulo: "Seguridad CCTV", desc: "Sistemas de videovigilancia. Cámaras HD, DVRs y configuración en Chaco para acceso remoto desde dispositivos móviles.", link: "#detalle-cctv" }
             ].map((servicio, i) => (
               <motion.article 
@@ -340,14 +340,15 @@ export default function Home() {
                 <motion.div
                   animate={{ y: [-15, 15, -15] }}
                   transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-                  className="relative w-full h-full"
+                  className="relative w-full h-full flex items-center justify-center"
                 >
                   <Image 
                     src="/logo-compufix.webp"
                     alt="Logotipo de Compufix SP, especialistas en tecnología"
-                    fill
+                    width={1700}
+                    height={488}
                     sizes="280px" 
-                    className="object-contain opacity-90 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]"
+                    className="w-full h-auto object-contain opacity-90 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]"
                   />
                 </motion.div>
               </motion.div>
@@ -360,7 +361,7 @@ export default function Home() {
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.6 }}
               >
-                <div className="flex items-center gap-3 mb-6">
+                <div className="flex items-center gap-3 mb-4 sm:mb-6">
                   <span className="w-2 h-2 bg-white"></span>
                   <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Leandro David</span>
                 </div>
@@ -411,54 +412,54 @@ export default function Home() {
       </section>
 
       {/* 4: DETALLE DESARROLLO */}
-      <section id="detalle-desarrollo" ref={desarrolloRef} className="relative bg-[#050505] py-20 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
-        <div aria-hidden="true" className="lg:hidden absolute inset-x-0 top-20 z-0 flex justify-center pointer-events-none select-none overflow-hidden">
+      <section id="detalle-desarrollo" ref={desarrolloRef} className="relative bg-[#050505] py-8 sm:py-16 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
+        <div aria-hidden="true" className="lg:hidden absolute inset-x-0 top-4 sm:top-20 z-0 flex justify-center pointer-events-none select-none overflow-hidden">
           <span className="text-[24vw] font-black uppercase tracking-tighter text-zinc-900/40 whitespace-nowrap leading-none">Desarrollo</span>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-24 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-8 lg:gap-24 items-center">
             
-            <div className="flex flex-col justify-center order-2 lg:order-1 relative z-10 -mt-24 lg:mt-0 bg-[#0A0A0A]/95 lg:bg-transparent backdrop-blur-sm border border-zinc-900 lg:border-0 p-6 md:p-10 lg:p-0 shadow-2xl lg:shadow-none">
+            <div className="flex flex-col justify-center order-2 lg:order-1 relative z-10 -mt-8 sm:-mt-14 lg:mt-0 bg-[#0A0A0A]/95 lg:bg-transparent backdrop-blur-sm border border-zinc-900 lg:border-0 p-4 sm:p-8 md:p-10 lg:p-0 shadow-2xl lg:shadow-none">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
-                <div className="flex items-center gap-3 mb-6">
+                <div className="flex items-center gap-3 mb-4 sm:mb-6">
                   <span className="w-2 h-2 bg-white"></span>
                   <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Servicio 01</span>
                 </div>
-                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-[1.1] mb-8">
-                  Desarrollo web <br /> a medida.
+                <h2 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-[1.1] mb-4 sm:mb-8">
+                  Desarrollo web <br className="hidden sm:block" /> a medida.
                 </h2>
               </motion.div>
 
-              <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.1 }} className="text-lg font-mono text-zinc-400 leading-relaxed mb-8">
+              <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.1 }} className="text-sm sm:text-base md:text-lg font-mono text-zinc-400 leading-relaxed mb-4 sm:mb-8">
                 Diseñamos y desarrollamos soluciones digitales preparadas para escalar. Creación de <strong>landing pages optimizadas para SEO local</strong> y aplicaciones web full-stack de alto rendimiento.
               </motion.p>
 
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.2 }} className="border-t border-zinc-900 pt-8 mt-4">
-                <h3 className="text-xs font-mono text-zinc-600 uppercase tracking-widest mb-6">Stack Tecnológico</h3>
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <li className="flex items-center gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> React & Next.js</li>
-                  <li className="flex items-center gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Control Git / GitHub</li>
-                  <li className="flex items-center gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Deploy en Vercel</li>
-                  <li className="flex items-center gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> WordPress Avanzado</li>
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.2 }} className="border-t border-zinc-900 pt-4 mt-2 sm:pt-8 sm:mt-4">
+                <h3 className="text-xs font-mono text-zinc-600 uppercase tracking-widest mb-3 sm:mb-6">Stack Tecnológico</h3>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4">
+                  <li className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> React & Next.js</li>
+                  <li className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Control Git / GitHub</li>
+                  <li className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Deploy en Vercel</li>
+                  <li className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> WordPress Avanzado</li>
                 </ul>
               </motion.div>
 
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-12 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-6 sm:mt-12 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
                 
                 {/* Botón Principal */}
-                <a href="#contacto" aria-label="Iniciar proyecto de Desarrollo Web" className="w-full sm:w-auto justify-center inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-8 py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-white transition-colors">
+                <a href="#contacto" aria-label="Iniciar proyecto de Desarrollo Web" className="w-full sm:w-auto justify-center inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-5 py-3 sm:px-8 sm:py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-white transition-colors">
                   Iniciar Desarrollo
                 </a>
 
                 {/* Botón Secundario: Portfolio (Amarillo Ácido) */}
-                <a href="/portfolio" aria-label="Ver Portfolio de Proyectos Web" className="w-full sm:w-auto justify-center inline-flex items-center gap-4 border border-[#E1F030]/50 bg-transparent px-8 py-4 text-xs font-mono text-[#E1F030] uppercase tracking-widest hover:border-[#E1F030] hover:bg-[#E1F030] hover:text-black transition-all duration-300 shadow-[0_0_15px_rgba(225,240,48,0.05)] hover:shadow-[0_0_25px_rgba(225,240,48,0.2)]">
+                <a href="/portfolio" aria-label="Ver Portfolio de Proyectos Web" className="w-full sm:w-auto justify-center inline-flex items-center gap-4 border border-[#E1F030]/50 bg-transparent px-5 py-3 sm:px-8 sm:py-4 text-xs font-mono text-[#E1F030] uppercase tracking-widest hover:border-[#E1F030] hover:bg-[#E1F030] hover:text-black transition-all duration-300 shadow-[0_0_15px_rgba(225,240,48,0.05)] hover:shadow-[0_0_25px_rgba(225,240,48,0.2)]">
                   Ver Portfolio
                 </a>
                 
               </motion.div>
             </div>
 
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full max-w-[28rem] mx-auto aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group translate-x-[-5%] translate-y-[3%] lg:translate-x-0 lg:translate-y-0">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full max-w-[28rem] mx-auto aspect-[16/7] sm:aspect-[3/2] lg:aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group translate-x-0 translate-y-0 lg:translate-x-0 lg:translate-y-0">
               <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
               <motion.div style={{ y: devImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
                 <Image src="/desarrollo-nuevo.webp" alt="Programación y Diseño de Sistemas Web a Medida" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
@@ -469,47 +470,60 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5: DETALLE MANTENIMIENTO */}
-      <section id="detalle-mantenimiento" ref={mantenimientoRef} className="relative bg-[#050505] py-20 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
-        <div aria-hidden="true" className="lg:hidden absolute inset-x-0 top-20 z-0 flex justify-center pointer-events-none select-none overflow-hidden">
-          <span className="text-[24vw] font-black uppercase tracking-tighter text-zinc-900/40 whitespace-nowrap leading-none">Hardware</span>
+      {/* 5: DETALLE SERVICIO TÉCNICO INTEGRAL */}
+      <section id="detalle-servicio-tecnico" ref={servicioTecnicoRef} className="relative bg-[#050505] py-8 sm:py-16 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
+        <span id="detalle-mantenimiento" aria-hidden="true" className="absolute -top-24" />
+        <span id="detalle-optimizacion" aria-hidden="true" className="absolute -top-24" />
+        <div aria-hidden="true" className="lg:hidden absolute inset-x-0 top-4 sm:top-20 z-0 flex justify-center pointer-events-none select-none overflow-hidden">
+          <span className="text-[24vw] font-black uppercase tracking-tighter text-zinc-900/40 whitespace-nowrap leading-none">Técnico</span>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-24 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-8 lg:gap-24 items-center">
             
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full max-w-[28rem] mx-auto aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group translate-x-[5%] translate-y-[3%] lg:translate-x-0 lg:translate-y-0">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full max-w-[28rem] mx-auto aspect-[16/7] sm:aspect-[3/2] lg:aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group translate-x-0 translate-y-0 lg:translate-x-0 lg:translate-y-0">
               <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
-              <motion.div style={{ y: mantImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
-                <Image src="/img-reparacion.webp" alt="Servicio Técnico, Mantenimiento y Reparación de PC en Chaco" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
+              <motion.div style={{ y: tecnicoImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
+                <Image src="/img-reparacion.webp" alt="Servicio Técnico Integral, reparación, mantenimiento y optimización de PC en Chaco" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
               </motion.div>
             </motion.div>
 
-            <div className="flex flex-col justify-center order-2 relative z-10 -mt-24 lg:mt-0 bg-[#0A0A0A]/95 lg:bg-transparent backdrop-blur-sm border border-zinc-900 lg:border-0 p-6 md:p-10 lg:p-0 shadow-2xl lg:shadow-none">
+            <div className="flex flex-col justify-center order-2 relative z-10 -mt-8 sm:-mt-14 lg:mt-0 bg-[#0A0A0A]/95 lg:bg-transparent backdrop-blur-sm border border-zinc-900 lg:border-0 p-4 sm:p-8 md:p-10 lg:p-0 shadow-2xl lg:shadow-none">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
-                <div className="flex items-center gap-3 mb-6">
+                <div className="flex items-center gap-3 mb-4 sm:mb-6">
                   <span className="w-2 h-2 bg-white"></span>
                   <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Servicio 02</span>
                 </div>
-                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-[1.1] mb-8">
-                  Mantenimiento <br /> de Hardware.
+                <h2 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-[1.1] mb-4 sm:mb-8">
+                  Servicio Técnico <br className="hidden sm:block" /> Integral.
                 </h2>
               </motion.div>
 
-              <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.1 }} className="text-lg font-mono text-zinc-400 leading-relaxed mb-8">
-                Un equipo lento o con sobrecalentamiento reduce tu productividad. Brindamos <strong>servicio técnico de PC especializado</strong> para asegurar estabilidad, velocidad y rendimiento continuo.
+              <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.1 }} className="text-sm sm:text-base md:text-lg font-mono text-zinc-400 leading-relaxed mb-4 sm:mb-8">
+                Un solo servicio para que tu equipo vuelva a rendir. Combinamos <strong>diagnóstico, reparación y mantenimiento</strong> con <strong>optimización, ampliación de RAM y migración a SSD</strong>, siempre con backup previo y garantía.
               </motion.p>
 
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.2 }} className="border-t border-zinc-900 pt-8 mt-4">
-                <h3 className="text-xs font-mono text-zinc-600 uppercase tracking-widest mb-6">Procedimientos Clave</h3>
-                <ul className="flex flex-col gap-4">
-                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span><strong>Diagnóstico preciso</strong>, limpieza física integral y recambio de pasta térmica.</span></li>
-                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Limpieza profunda de virus, malware y optimización del sistema operativo.</span></li>
-                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Reinstalación de sistemas (Windows/Linux) con <strong>backup preventivo estricto</strong>.</span></li>
-                </ul>
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.2 }} className="border-t border-zinc-900 pt-4 mt-2 sm:pt-8 sm:mt-4 flex flex-col gap-4 sm:gap-8">
+                <div>
+                  <h3 className="text-xs font-mono text-zinc-600 uppercase tracking-widest mb-3 sm:mb-6">Reparación y Mantenimiento</h3>
+                  <ul className="flex flex-col gap-2 sm:gap-4">
+                    <li className="flex items-start gap-3 text-xs sm:text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span><strong>Diagnóstico preciso</strong>, limpieza física integral y recambio de pasta térmica.</span></li>
+                    <li className="flex items-start gap-3 text-xs sm:text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Limpieza profunda de virus, malware y optimización del sistema operativo.</span></li>
+                    <li className="flex items-start gap-3 text-xs sm:text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Reinstalación de sistemas (Windows/Linux) con <strong>backup preventivo estricto</strong>.</span></li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="text-xs font-mono text-zinc-600 uppercase tracking-widest mb-3 sm:mb-6">Optimización y Upgrades</h3>
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4">
+                    <li className="flex items-start gap-3 text-xs sm:text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Migración a Discos Sólidos (SSD).</li>
+                    <li className="flex items-start gap-3 text-xs sm:text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Ampliación de Memoria RAM.</li>
+                    <li className="flex items-start gap-3 text-xs sm:text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Clonación de discos sin pérdida.</li>
+                    <li className="flex items-start gap-3 text-xs sm:text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Asesoramiento para armado PC Gamer.</li>
+                  </ul>
+                </div>
               </motion.div>
 
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-12">
-                <a href="#contacto" aria-label="Solicitar Diagnóstico de PC" className="inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-8 py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-white transition-colors">
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-6 sm:mt-12">
+                <a href="#contacto" aria-label="Solicitar Diagnóstico de PC" className="inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-5 py-3 sm:px-8 sm:py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-white transition-colors">
                   Solicitar Diagnóstico
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </a>
@@ -520,51 +534,52 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 6: DETALLE OPTIMIZACIÓN */}
-      <section id="detalle-optimizacion" ref={optimizacionRef} className="relative bg-[#050505] py-20 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
-        <div aria-hidden="true" className="lg:hidden absolute inset-x-0 top-20 z-0 flex justify-center pointer-events-none select-none overflow-hidden">
-          <span className="text-[24vw] font-black uppercase tracking-tighter text-zinc-900/40 whitespace-nowrap leading-none">Upgrade</span>
+      {/* 6: DETALLE STARLINK Y REDES */}
+      <section id="detalle-starlink" ref={starlinkRef} className="relative bg-[#050505] py-8 sm:py-16 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
+        <div aria-hidden="true" className="lg:hidden absolute inset-x-0 top-4 sm:top-20 z-0 flex justify-center pointer-events-none select-none overflow-hidden">
+          <span className="text-[24vw] font-black uppercase tracking-tighter text-zinc-900/40 whitespace-nowrap leading-none">Redes</span>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-24 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-8 lg:gap-24 items-center">
             
-            <div className="flex flex-col justify-center order-2 lg:order-1 relative z-10 -mt-24 lg:mt-0 bg-[#0A0A0A]/95 lg:bg-transparent backdrop-blur-sm border border-zinc-900 lg:border-0 p-6 md:p-10 lg:p-0 shadow-2xl lg:shadow-none">
+            <div className="flex flex-col justify-center order-2 lg:order-1 relative z-10 -mt-8 sm:-mt-14 lg:mt-0 bg-[#0A0A0A]/95 lg:bg-transparent backdrop-blur-sm border border-zinc-900 lg:border-0 p-4 sm:p-8 md:p-10 lg:p-0 shadow-2xl lg:shadow-none">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
-                <div className="flex items-center gap-3 mb-6">
+                <div className="flex items-center gap-3 mb-4 sm:mb-6">
                   <span className="w-2 h-2 bg-white"></span>
                   <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Servicio 03</span>
                 </div>
-                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-[1.1] mb-8">
-                  Optimización <br /> y Upgrades.
+                <h2 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-[1.1] mb-4 sm:mb-8">
+                  Starlink <br className="hidden sm:block" /> y Redes.
                 </h2>
               </motion.div>
 
-              <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.1 }} className="text-lg font-mono text-zinc-400 leading-relaxed mb-8">
-                Evitá comprar una computadora nueva. Mediante la <strong>ampliación de memoria RAM y clonación a SSD</strong>, le damos una segunda vida a tu infraestructura, multiplicando su velocidad drásticamente.
+              <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.1 }} className="text-sm sm:text-base md:text-lg font-mono text-zinc-400 leading-relaxed mb-4 sm:mb-8">
+                Instalamos y configuramos tu conexión <strong>Starlink de punta a punta</strong>: montaje de antena, orientación, cableado y red WiFi optimizada para que la velocidad llegue a todos los ambientes.
               </motion.p>
 
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.2 }} className="border-t border-zinc-900 pt-8 mt-4">
-                <h3 className="text-xs font-mono text-zinc-600 uppercase tracking-widest mb-6">Mejoras Aplicadas</h3>
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Migración a Discos Sólidos (SSD).</li>
-                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Ampliación de Memoria RAM.</li>
-                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Clonación de discos sin pérdida.</li>
-                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600">/</span> Asesoramiento para armado PC Gamer.</li>
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.2 }} className="border-t border-zinc-900 pt-4 mt-2 sm:pt-8 sm:mt-4">
+                <h3 className="text-xs font-mono text-zinc-600 uppercase tracking-widest mb-3 sm:mb-6">Conectividad Integral</h3>
+                <ul className="flex flex-col gap-2 sm:gap-4">
+                  <li className="flex items-start gap-3 text-xs sm:text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Instalación y montaje de antena Starlink con orientación y cableado.</span></li>
+                  <li className="flex items-start gap-3 text-xs sm:text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Configuración de router, red principal e invitados.</span></li>
+                  <li className="flex items-start gap-3 text-xs sm:text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Redes cableadas, switches y puntos de red.</span></li>
+                  <li className="flex items-start gap-3 text-xs sm:text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Repetidores y sistemas mesh para ampliar la cobertura WiFi.</span></li>
+                  <li className="flex items-start gap-3 text-xs sm:text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Diagnóstico de velocidad, estabilidad y cortes de conexión.</span></li>
                 </ul>
               </motion.div>
 
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-12">
-                <a href="#contacto" aria-label="Cotizar Hardware Upgrade" className="inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-8 py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-white transition-colors">
-                  Cotizar Upgrade
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-6 sm:mt-12">
+                <a href="#contacto" aria-label="Cotizar instalación de Starlink y redes" className="inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-5 py-3 sm:px-8 sm:py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-white transition-colors">
+                  Cotizar Instalación
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </a>
               </motion.div>
             </div>
 
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full max-w-[28rem] mx-auto aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group translate-x-[-5%] translate-y-[3%] lg:translate-x-0 lg:translate-y-0">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full max-w-[28rem] mx-auto aspect-[16/7] sm:aspect-[3/2] lg:aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group translate-x-0 translate-y-0 lg:translate-x-0 lg:translate-y-0">
               <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
-              <motion.div style={{ y: optiImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
-                <Image src="/img-opti.webp" alt="Hardware Upgrade, ampliación SSD y memoria RAM" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
+              <motion.div style={{ y: starlinkImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
+                <Image src="/img-starlink.webp" alt="Instalación de antena Starlink y configuración de redes WiFi" fill loading="eager" sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
               </motion.div>
             </motion.div>
 
@@ -573,46 +588,46 @@ export default function Home() {
       </section>
 
       {/* 7: DETALLE CCTV */}
-      <section id="detalle-cctv" ref={cctvRef} className="relative bg-[#050505] py-20 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
-        <div aria-hidden="true" className="lg:hidden absolute inset-x-0 top-20 z-0 flex justify-center pointer-events-none select-none overflow-hidden">
+      <section id="detalle-cctv" ref={cctvRef} className="relative bg-[#050505] py-8 sm:py-16 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
+        <div aria-hidden="true" className="lg:hidden absolute inset-x-0 top-4 sm:top-20 z-0 flex justify-center pointer-events-none select-none overflow-hidden">
           <span className="text-[24vw] font-black uppercase tracking-tighter text-zinc-900/40 whitespace-nowrap leading-none">Seguridad</span>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-24 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-8 lg:gap-24 items-center">
             
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full max-w-[28rem] mx-auto aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group translate-x-[5%] translate-y-[3%] lg:translate-x-0 lg:translate-y-0">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full max-w-[28rem] mx-auto aspect-[16/7] sm:aspect-[3/2] lg:aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group translate-x-0 translate-y-0 lg:translate-x-0 lg:translate-y-0">
               <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
               <motion.div style={{ y: cctvImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
                 <Image src="/img-camaras.webp" alt="Instalación de Cámaras de Seguridad CCTV y Videovigilancia" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
               </motion.div>
             </motion.div>
 
-            <div className="flex flex-col justify-center order-2 relative z-10 -mt-24 lg:mt-0 bg-[#0A0A0A]/95 lg:bg-transparent backdrop-blur-sm border border-zinc-900 lg:border-0 p-6 md:p-10 lg:p-0 shadow-2xl lg:shadow-none">
+            <div className="flex flex-col justify-center order-2 relative z-10 -mt-8 sm:-mt-14 lg:mt-0 bg-[#0A0A0A]/95 lg:bg-transparent backdrop-blur-sm border border-zinc-900 lg:border-0 p-4 sm:p-8 md:p-10 lg:p-0 shadow-2xl lg:shadow-none">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
-                <div className="flex items-center gap-3 mb-6">
+                <div className="flex items-center gap-3 mb-4 sm:mb-6">
                   <span className="w-2 h-2 bg-white"></span>
                   <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Servicio 04</span>
                 </div>
-                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-[1.1] mb-8">
-                  Seguridad <br /> CCTV 24/7.
+                <h2 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-[1.1] mb-4 sm:mb-8">
+                  Seguridad <br className="hidden sm:block" /> CCTV 24/7.
                 </h2>
               </motion.div>
 
-              <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.1 }} className="text-lg font-mono text-zinc-400 leading-relaxed mb-8">
+              <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.1 }} className="text-sm sm:text-base md:text-lg font-mono text-zinc-400 leading-relaxed mb-4 sm:mb-8">
                 Protegé tu hogar o espacio de trabajo. Realizamos <strong>instalación de cámaras de seguridad y sistemas de videovigilancia CCTV</strong> de alta definición con diseño de cobertura estratégica.
               </motion.p>
 
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.2 }} className="border-t border-zinc-900 pt-8 mt-4">
-                <h3 className="text-xs font-mono text-zinc-600 uppercase tracking-widest mb-6">Infraestructura</h3>
-                <ul className="flex flex-col gap-4">
-                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Instalación de cámaras HD y configuración completa de DVRs.</span></li>
-                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Monitoreo remoto en tiempo real desde smartphone o PC.</span></li>
-                  <li className="flex items-start gap-3 text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Revisión e implementación técnica de cableado estructurado.</span></li>
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.2 }} className="border-t border-zinc-900 pt-4 mt-2 sm:pt-8 sm:mt-4">
+                <h3 className="text-xs font-mono text-zinc-600 uppercase tracking-widest mb-3 sm:mb-6">Infraestructura</h3>
+                <ul className="flex flex-col gap-2 sm:gap-4">
+                  <li className="flex items-start gap-3 text-xs sm:text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Instalación de cámaras HD y configuración completa de DVRs.</span></li>
+                  <li className="flex items-start gap-3 text-xs sm:text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Monitoreo remoto en tiempo real desde smartphone o PC.</span></li>
+                  <li className="flex items-start gap-3 text-xs sm:text-sm font-mono text-zinc-300"><span className="text-zinc-600 mt-0.5">/</span> <span>Revisión e implementación técnica de cableado estructurado.</span></li>
                 </ul>
               </motion.div>
 
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-12">
-                <a href="#contacto" aria-label="Presupuestar proyecto CCTV" className="inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-8 py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-white transition-colors">
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-6 sm:mt-12">
+                <a href="#contacto" aria-label="Presupuestar proyecto CCTV" className="inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-5 py-3 sm:px-8 sm:py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-white transition-colors">
                   Presupuestar Proyecto
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </a>
@@ -746,7 +761,7 @@ export default function Home() {
             
             <div className="lg:col-span-4 lg:sticky lg:top-40">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
-                <div className="flex items-center gap-3 mb-6">
+                <div className="flex items-center gap-3 mb-4 sm:mb-6">
                   <span className="w-2 h-2 bg-white"></span>
                   <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Dudas Comunes</span>
                 </div>
@@ -760,10 +775,12 @@ export default function Home() {
             </div>
 
             <div className="lg:col-span-8 flex flex-col border-t border-zinc-900">
-              <FaqItem pregunta="¿Tienen garantía los mantenimientos de PC?" respuesta="Si, Todos nuestros trabajos de reparación de hardware, limpieza física y actualizaciones SSD/RAM cuentan con garantía." />
+
               <FaqItem pregunta="¿Si reparan u optimizan mi equipo, pierdo mis archivos y documentos?" respuesta="Para nada. Siempre realizamos copias de seguridad antes de modificar algo, de esta manera tu información está segura." />
               <FaqItem pregunta="¿El servicio de desarrollo web aplica fuera del Chaco?" respuesta="Sí, el área de Sistemas Web funciona 100% online. Desarrollamos páginas para clientes de todo Argentina mediante metodologías ágiles a distancia." />
               <FaqItem pregunta="¿Qué necesito para cotizar la instalación de cámaras CCTV?" respuesta="Basta con comunicarte al WhatsApp. Evaluamos la cobertura necesaria de tu domicilio o negocio y preparamos un presupuesto de videovigilancia a medida." />
+              <FaqItem pregunta="¿Venden antenas Starlink?" respuesta="No, no ofercemos el servicio de venta pero si te recomendamos qué equipo se adapta a tus necesidades. El servicio de instalación incluye el montaje, la orientación y el cableado de la antena, además de la configuración del router y la red WiFi, en domicilios y comercios de Presidencia Roque Sáenz Peña y alrededores." />
+              <FaqItem pregunta="¿También mejoran el WiFi de mi casa o negocio?" respuesta="Sí. Instalamos repetidores o sistemas mesh, ordenamos el cableado y configuramos la red para mejorar la cobertura y la estabilidad de la conexión." />
               <FaqItem pregunta="¿Venden equipos informáticos nuevos?" respuesta="Nos centramos en la reparación de PC, optimización y montaje técnico de equipos armados bajo pedido, ya sea para oficina, diseño gráfico o gaming." />
               <FaqItem pregunta="¿Cómo es el sistema de pagos?" respuesta="El servicio técnico físico se abona al finalizar exitosamente. Para diseño web, trabajamos con un anticipo del 50%. Aceptamos efectivo, transferencias y billeteras virtuales." />
             </div>
@@ -779,7 +796,7 @@ export default function Home() {
             
             <div className="flex flex-col justify-center">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
-                <div className="flex items-center gap-3 mb-6">
+                <div className="flex items-center gap-3 mb-4 sm:mb-6">
                   <span className="w-2 h-2 bg-white"></span>
                   <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Iniciá tu consulta</span>
                 </div>
@@ -787,7 +804,7 @@ export default function Home() {
                   Hablemos.
                 </h2>
                 <p className="text-lg font-mono text-zinc-400 leading-relaxed mb-12">
-                  ¿Buscás optimizar tu PC, instalar cámaras de seguridad o crear una página web? Escribinos y transformemos esa idea en realidad.
+                  ¿Buscás optimizar tu PC, instalar Starlink o cámaras de seguridad, o crear una página web? Escribinos y transformemos esa idea en realidad.
                 </p>
 
                 <address className="flex flex-col gap-6 pt-8 border-t border-zinc-900 not-italic">
@@ -825,8 +842,8 @@ export default function Home() {
                   <select id="servicio" name="servicio" required defaultValue="" className="w-full bg-[#0A0A0A] border-b border-zinc-800 py-4 text-zinc-400 font-mono text-sm focus:outline-none focus:border-white transition-colors appearance-none cursor-pointer">
                     <option value="" disabled hidden>Seleccioná un servicio...</option>
                     <option value="desarrollo" className="bg-[#0A0A0A] text-white">Desarrollo Web / Páginas</option>
-                    <option value="mantenimiento" className="bg-[#0A0A0A] text-white">Reparación de PC</option>
-                    <option value="upgrade" className="bg-[#0A0A0A] text-white">Hardware y Upgrades</option>
+                    <option value="servicio-tecnico" className="bg-[#0A0A0A] text-white">Servicio Técnico Integral (reparación + optimización)</option>
+                    <option value="starlink" className="bg-[#0A0A0A] text-white">Starlink y Redes</option>
                     <option value="cctv" className="bg-[#0A0A0A] text-white">Cámaras de Seguridad CCTV</option>
                     <option value="otro" className="bg-[#0A0A0A] text-white">Otras consultas</option>
                   </select>
@@ -871,7 +888,7 @@ export default function Home() {
             <div className="flex flex-col">
               <span className="text-2xl font-black uppercase tracking-tighter text-white mb-4">Compufix.SP</span>
               <p className="text-sm font-mono text-zinc-500 max-w-xs leading-relaxed">
-                Arquitectura de hardware, sistemas CCTV y desarrollo web. Elevando el estándar técnico en la provincia.
+                Arquitectura de hardware, redes y conectividad Starlink, sistemas CCTV y desarrollo web. Elevando el estándar técnico en la provincia.
               </p>
             </div>
 

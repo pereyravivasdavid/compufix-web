@@ -15,13 +15,13 @@ const roboto = Roboto({
 
 // Metadatos para SEO
 export const metadata: Metadata = {
-  title: "Compufix-sp | Mantenimiento de pc y desarrollo web",
-  description: "Soluciones técnicas por Leandro David en Presidencia Roque Sáenz Peña, Chaco. Especialista en reparación de pc, instalación de cámaras de seguridad y desarrollo web a medida.",
-  keywords: "mantenimiento de pc, reparación de notebooks, cámaras de seguridad, desarrollo web, Presidencia Roque Sáenz Peña, Chaco, soporte técnico",
+  title: "Compufix-sp | Servicio técnico, Starlink y desarrollo web",
+  description: "Soluciones técnicas por Leandro David en Presidencia Roque Sáenz Peña, Chaco. Servicio técnico integral, instalación de Starlink y redes, cámaras de seguridad y desarrollo web a medida.",
+  keywords: "mantenimiento de pc, reparación de notebooks, servicio técnico integral, instalación starlink, redes wifi, repetidores wifi, cableado estructurado, cámaras de seguridad, desarrollo web, Presidencia Roque Sáenz Peña, Chaco, soporte técnico",
   authors: [{ name: "Leandro David" }],
   openGraph: {
     title: "Compufix-sp | Soluciones tecnológicas",
-    description: "Mantenimiento de pc, instalación de cámaras de seguridad y desarrollo web a medida en Presidencia Roque Sáenz Peña.",
+    description: "Servicio técnico integral, instalación de Starlink y redes, cámaras de seguridad y desarrollo web a medida en Presidencia Roque Sáenz Peña.",
     url: "https://www.compufix-sp.com.ar/", // Acá vas a poner tu dominio final cuando lo tengas
     siteName: "Compufix-sp",
     locale: "es_AR",

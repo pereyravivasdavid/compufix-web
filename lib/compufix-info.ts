@@ -37,11 +37,11 @@ export const MAIN_ACTIONS: QuickAction[] = [
 
 export const INTENTS: Record<string, ChatReply> = {
   servicios: {
-    text: "Nos dividimos en cuatro frentes:\n\n• Desarrollo web a medida\n• Mantenimiento y reparación de PC\n• Hardware upgrades (SSD / RAM)\n• Cámaras de seguridad CCTV\n\n¿Cuál te interesa?",
+    text: "Nos dividimos en cuatro frentes:\n\n• Desarrollo web a medida\n• Servicio técnico integral (reparación + upgrades)\n• Starlink y redes\n• Cámaras de seguridad CCTV\n\n¿Cuál te interesa?",
     actions: [
       { label: "Desarrollo web", intent: "desarrollo" },
-      { label: "Mantenimiento", intent: "mantenimiento" },
-      { label: "Upgrades", intent: "upgrade" },
+      { label: "Servicio técnico", intent: "servicio-tecnico" },
+      { label: "Starlink y Redes", intent: "starlink" },
       { label: "CCTV", intent: "cctv" },
     ],
   },
@@ -55,24 +55,24 @@ export const INTENTS: Record<string, ChatReply> = {
       { label: "Ver portfolio", href: "/portfolio" },
     ],
   },
-  mantenimiento: {
-    text: "Hacemos diagnóstico, limpieza física integral, cambio de pasta térmica, eliminación de virus y reinstalación de Windows o Linux con backup previo. Todos los trabajos tienen garantía.",
+  "servicio-tecnico": {
+    text: "Hacemos diagnóstico, reparación y mantenimiento de PC, además de upgrades de SSD y RAM. Incluye limpieza física, cambio de pasta térmica, eliminación de virus y reinstalación de Windows o Linux con backup previo. Todos los trabajos tienen garantía.",
     actions: [
       {
         label: "Consultar por mi PC",
-        href: waLink("Hola Compufix! Quiero consultar por mantenimiento o reparación de PC."),
+        href: waLink("Hola Compufix! Quiero consultar por el servicio técnico integral."),
       },
-      { label: "Ver detalles", href: "/#detalle-mantenimiento" },
+      { label: "Ver detalles", href: "/#detalle-servicio-tecnico" },
     ],
   },
-  upgrade: {
-    text: "Ampliamos memoria RAM y migramos a SSD para que el equipo rinda como nuevo, sin perder datos. También asesoramos para armar PCs gamer.",
+  starlink: {
+    text: "Instalamos antenas Starlink con montaje, orientación y cableado, y configuramos router, WiFi, redes cableadas y repetidores mesh para mejorar la cobertura y estabilidad de la conexión.",
     actions: [
       {
-        label: "Cotizar upgrade",
-        href: waLink("Hola Compufix! Quiero cotizar un upgrade de SSD o RAM."),
+        label: "Cotizar Starlink",
+        href: waLink("Hola Compufix! Quiero cotizar la instalación de Starlink y la configuración de mi red."),
       },
-      { label: "Ver detalles", href: "/#detalle-optimizacion" },
+      { label: "Ver detalles", href: "/#detalle-starlink" },
     ],
   },
   cctv: {
@@ -149,7 +149,7 @@ const KEYWORDS: Record<string, string[]> = {
     "cotizacion",
     "tarifa",
   ],
-  mantenimiento: [
+  "servicio-tecnico": [
     "mantenimiento",
     "reparacion",
     "reparar",
@@ -162,10 +162,38 @@ const KEYWORDS: Record<string, string[]> = {
     "formatear",
     "lenta",
     "lento",
-    "lenta",
     "calienta",
     "pasta termica",
     "servicio tecnico",
+    "upgrade",
+    "ssd",
+    "ram",
+    "memoria",
+    "disco",
+    "gamer",
+    "ampliar",
+    "optimizar",
+    "optimizacion",
+  ],
+  starlink: [
+    "starlink",
+    "antena",
+    "antenas",
+    "satelital",
+    "satelite",
+    "internet",
+    "wifi",
+    "wi fi",
+    "red",
+    "redes",
+    "router",
+    "mesh",
+    "repetidor",
+    "repetidores",
+    "cableado",
+    "conexion",
+    "velocidad",
+    "cobertura",
   ],
   desarrollo: [
     "desarrollo",
@@ -180,16 +208,6 @@ const KEYWORDS: Record<string, string[]> = {
     "seo",
     "tienda",
     "ecommerce",
-  ],
-  upgrade: [
-    "upgrade",
-    "ssd",
-    "ram",
-    "memoria",
-    "disco",
-    "gamer",
-    "ampliar",
-    "optimizar",
   ],
   cctv: [
     "cctv",
@@ -250,9 +268,9 @@ const KEYWORDS: Record<string, string[]> = {
 
 const PRIORIDAD = [
   "presupuesto",
-  "mantenimiento",
+  "servicio-tecnico",
+  "starlink",
   "desarrollo",
-  "upgrade",
   "cctv",
   "garantia",
   "pagos",
