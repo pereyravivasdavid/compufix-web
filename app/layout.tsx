@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
-import { Roboto } from "next/font/google";
+import { Roboto, Geist } from "next/font/google";
 import Script from "next/script";
 import FloatingActions from "@/components/FloatingActions";
 import "./globals.css";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const GA_ID = "G-VMLC9SLMBR";
 
@@ -35,8 +38,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className="scroll-smooth">
+    <html lang="es" className={cn("scroll-smooth", "font-sans", geist.variable)}>
       <body className={`${roboto.className} antialiased text-gray-900 bg-white`}>
+        {/* El logo del hero se dibuja en canvas: adelantamos su descarga para que la animación arranque antes. */}
+        <link rel="preload" as="image" href="/logo.png" fetchPriority="high" />
         {children}
         <FloatingActions />
         <Script

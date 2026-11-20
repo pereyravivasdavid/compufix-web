@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useEffect, useState } from "react";
-import { motion, useScroll, useTransform, useSpring, AnimatePresence, MotionConfig } from "framer-motion";
+import { useRef, useEffect, useState, type CSSProperties } from "react";
+import { motion, useScroll, useTransform, AnimatePresence, MotionConfig } from "framer-motion";
+import { LiquidGlassLogo } from "@/components/liquid-glass-logo";
 
 // Componente FAQ Optimizado
 const FaqItem = ({ pregunta, respuesta }: { pregunta: string, respuesta: string }) => {
@@ -18,8 +19,8 @@ const FaqItem = ({ pregunta, respuesta }: { pregunta: string, respuesta: string 
           {pregunta}
         </h3>
         <div className="relative w-6 h-6 shrink-0 flex items-center justify-center pointer-events-none">
-          <span className={`absolute w-full h-[2px] bg-zinc-500 group-hover:bg-white transition-all duration-300 ${isOpen ? "rotate-180 bg-white" : ""}`}></span>
-          <span className={`absolute w-full h-[2px] bg-zinc-500 group-hover:bg-white transition-all duration-300 ${isOpen ? "rotate-0 opacity-0" : "rotate-90"}`}></span>
+          <span className={`absolute w-full h-[2px] bg-zinc-500 group-hover:bg-[#E1F030] transition-all duration-300 ${isOpen ? "rotate-180 bg-[#E1F030]" : ""}`}></span>
+          <span className={`absolute w-full h-[2px] bg-zinc-500 group-hover:bg-[#E1F030] transition-all duration-300 ${isOpen ? "rotate-0 opacity-0" : "rotate-90"}`}></span>
         </div>
       </button>
       <AnimatePresence>
@@ -44,6 +45,38 @@ const FaqItem = ({ pregunta, respuesta }: { pregunta: string, respuesta: string 
 // Componente Text Carousel (estilo Originkit)
 const PALABRAS_ROTATIVAS = ["Desarrollo", "Hardware", "Redes", "Seguridad"];
 
+// Catálogo de servicios con acento de color por área
+const SERVICIOS = [
+  {
+    num: "01",
+    titulo: "Desarrollo Web",
+    desc: "Sistemas a medida, landing pages de alta conversión y plataformas robustas creadas con las últimas tecnologías.",
+    link: "#detalle-desarrollo",
+    acento: "#E1F030",
+  },
+  {
+    num: "02",
+    titulo: "Servicio Técnico Integral",
+    desc: "Diagnóstico, reparación y mantenimiento de PC, más upgrades de SSD y RAM para recuperar rendimiento sin cambiar de equipo.",
+    link: "#detalle-servicio-tecnico",
+    acento: "#E1F030",
+  },
+  {
+    num: "03",
+    titulo: "Starlink y Redes",
+    desc: "Instalación de antena Starlink, configuración de router y WiFi, redes cableadas y repetidores para una conexión estable.",
+    link: "#detalle-starlink",
+    acento: "#E1F030",
+  },
+  {
+    num: "04",
+    titulo: "Seguridad CCTV",
+    desc: "Sistemas de videovigilancia. Cámaras HD, DVRs y configuración en Chaco para acceso remoto desde dispositivos móviles.",
+    link: "#detalle-cctv",
+    acento: "#E1F030",
+  },
+];
+
 const TextCarousel = () => {
   const [index, setIndex] = useState(0);
 
@@ -56,7 +89,7 @@ const TextCarousel = () => {
 
   return (
     <motion.span
-      className="relative inline-flex items-center justify-center border border-zinc-800 bg-white w-[260px] sm:w-[300px] md:w-[420px] lg:w-[560px] py-3 md:py-4 shadow-[4px_4px_0px_#18181b]"
+      className="relative inline-flex items-center justify-center border border-zinc-800 bg-white w-[210px] sm:w-[240px] md:w-[320px] lg:w-[400px] py-2 md:py-3 shadow-[4px_4px_0px_#18181b]"
     >
       <span className="sr-only">{palabra}</span>
       <AnimatePresence mode="popLayout" initial={false}>
@@ -76,7 +109,7 @@ const TextCarousel = () => {
                 center: { y: "0%", opacity: 1, transition: { duration: 0.4, ease: "easeOut", delay: i * 0.035 } },
                 exit: { y: "-110%", opacity: 0, transition: { duration: 0.3, ease: "easeIn", delay: i * 0.025 } },
               }}
-              className="inline-block text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter text-black"
+              className="inline-block text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tighter text-black"
             >
               {letra}
             </motion.span>
@@ -116,13 +149,69 @@ export default function Home() {
   const volverArriba = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   // ---------------------------------------------------
+  // CARRUSEL DE SERVICIOS
+  // ---------------------------------------------------
+  const [servicioActivo, setServicioActivo] = useState(0);
+  const [estadoAnuncio, setEstadoAnuncio] = useState("");
+  const serviciosTrackRef = useRef<HTMLDivElement>(null);
+  const serviciosCardsRef = useRef<(HTMLElement | null)[]>([]);
+  const rafServiciosRef = useRef<number | null>(null);
+  const anuncioServiciosRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const primerCalculoServiciosRef = useRef(true);
+
+  const irAServicio = (index: number) => {
+    const track = serviciosTrackRef.current;
+    const card = serviciosCardsRef.current[index];
+    if (!track || !card) return;
+    const destino = track.scrollLeft + card.getBoundingClientRect().left - track.getBoundingClientRect().left;
+    const reducirMovimiento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    track.scrollTo({ left: destino, behavior: reducirMovimiento ? "auto" : "smooth" });
+    setServicioActivo(index);
+  };
+
+  const calcularServicioActivo = () => {
+    const track = serviciosTrackRef.current;
+    if (!track) return;
+    const trackLeft = track.getBoundingClientRect().left;
+    let cercano = 0;
+    let distanciaMinima = Infinity;
+    serviciosCardsRef.current.forEach((card, i) => {
+      if (!card) return;
+      const distancia = Math.abs(card.getBoundingClientRect().left - trackLeft);
+      if (distancia < distanciaMinima) {
+        distanciaMinima = distancia;
+        cercano = i;
+      }
+    });
+    setServicioActivo(cercano);
+    if (primerCalculoServiciosRef.current) {
+      primerCalculoServiciosRef.current = false;
+      return;
+    }
+    if (anuncioServiciosRef.current) clearTimeout(anuncioServiciosRef.current);
+    anuncioServiciosRef.current = setTimeout(() => {
+      setEstadoAnuncio(`Servicio ${cercano + 1} de ${SERVICIOS.length}: ${SERVICIOS[cercano].titulo}`);
+    }, 250);
+  };
+
+  const alDesplazarServicios = () => {
+    if (rafServiciosRef.current !== null) return;
+    rafServiciosRef.current = requestAnimationFrame(() => {
+      rafServiciosRef.current = null;
+      calcularServicioActivo();
+    });
+  };
+
+  useEffect(() => {
+    return () => {
+      if (rafServiciosRef.current !== null) cancelAnimationFrame(rafServiciosRef.current);
+      if (anuncioServiciosRef.current) clearTimeout(anuncioServiciosRef.current);
+    };
+  }, []);
+
+  // ---------------------------------------------------
   // FÍSICAS DE SCROLL
   // ---------------------------------------------------
-  const horizontalRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: horizontalProgress } = useScroll({ target: horizontalRef, offset: ["start start", "end end"] });
-  const smoothProgress = useSpring(horizontalProgress, { stiffness: 200, damping: 25, mass: 0.1 });
-  const x = useTransform(smoothProgress, [0, 1], ["calc(0% + 0vw)", "calc(-100% + 100vw)"]);
-  
   const desarrolloRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress: devProgress } = useScroll({ target: desarrolloRef, offset: ["start end", "end start"] });
   const devImageY = useTransform(devProgress, [0, 1], ["-20%", "20%"]);
@@ -141,7 +230,7 @@ export default function Home() {
 
   return (
     <MotionConfig reducedMotion="user">
-    <main className="bg-black text-white min-h-screen selection:bg-white selection:text-black">
+    <main className="bg-black text-white min-h-screen selection:bg-[#E1F030] selection:text-black">
       
       {/* HEADER */}
       <header className="header-no-blend fixed top-0 w-full z-50 p-6 md:px-12 flex justify-between items-center mix-blend-difference pointer-events-none">
@@ -233,29 +322,40 @@ export default function Home() {
       </AnimatePresence>
 
       {/* 1: HERO */}
-      <section id="inicio" className="relative h-screen min-h-[620px] bg-[#050505] flex items-center justify-center overflow-hidden">
+      <section id="inicio" className="relative min-h-screen bg-[#050505] flex items-center justify-center overflow-hidden py-24 md:py-16">
         <div className="absolute inset-0 bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:24px_24px] opacity-30"></div>
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(60% 50% at 50% 35%, rgba(225,240,48,0.08), transparent 70%)" }} />
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="relative z-10 text-center px-4 flex flex-col items-center"
+          className="relative z-10 w-full text-center px-4 flex flex-col items-center"
         >
-          <div className="inline-flex items-center gap-4 px-4 py-2 border border-zinc-800 bg-black mb-8 shadow-[4px_4px_0px_#18181b]">
-            <span className="w-2 h-2 bg-white"></span>
+          <div className="relative z-20 inline-flex items-center gap-4 px-4 py-2 border border-zinc-800 bg-black mb-2 md:mb-4 shadow-[4px_4px_0px_#18181b]">
+            <span className="w-2 h-2 bg-[#E1F030]"></span>
             <span className="text-[10px] sm:text-xs font-mono text-zinc-400 uppercase tracking-widest">
               Presidencia Roque Sáenz Peña, Chaco
             </span>
           </div>
 
-          <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase leading-[0.85] mb-10">
-            Compufix
-            <span className="text-zinc-600">.sp</span>
+          <h1 className="w-[calc(100%+3rem)] max-w-[1100px] h-[360px] sm:h-[440px] lg:h-[760px] -my-28 lg:-my-60">
+            <LiquidGlassLogo
+              logo="/logo.png"
+              ending="logo"
+              theme="dark"
+              logoSize={520}
+              logoScale={1}
+              tile={false}
+              logoColor="#ffffff"
+              background="transparent"
+              height="100%"
+              aria-label="Compufix.sp"
+            />
           </h1>
 
-          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 mb-14">
-            <span className="text-sm md:text-xl font-mono text-zinc-500 uppercase tracking-widest">
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-5 mb-10 md:mb-12 -mt-2 md:-mt-6">
+            <span className="text-xs md:text-base font-mono text-zinc-500 uppercase tracking-widest">
               Especialistas en
             </span>
             <TextCarousel />
@@ -272,55 +372,123 @@ export default function Home() {
       </section>
 
       {/* 2: SERVICIOS */}
-      <section id="servicios" ref={horizontalRef} className="relative h-[300vh] lg:h-[600vh] bg-[#050505] z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.8)] border-t border-zinc-900">
-        <div className="sticky top-0 h-screen flex flex-col justify-end md:justify-center pb-12 md:pb-0 overflow-hidden">
-          
-          <div className="absolute left-6 md:left-12 top-28 md:top-32 z-0 pointer-events-none">
-            <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest block mb-4">
-              {"// Catálogo de Servicios"}
-            </span>
-            <h2 className="text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter text-zinc-800 md:text-white/5 leading-[1.15] pt-2">
-              Nuestras <br className="hidden md:block" /> Soluciones.
-            </h2>
+      <section id="servicios" className="relative bg-[#050505] py-20 lg:py-32 border-t border-zinc-900 z-20 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-10 md:mb-16">
+            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
+              <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest block mb-4">
+                {"// Catálogo de Servicios"}
+              </span>
+              <h2 className="text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter text-white leading-[1.05]">
+                Nuestras <br className="hidden md:block" /> Soluciones.
+              </h2>
+            </motion.div>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => irAServicio((servicioActivo - 1 + SERVICIOS.length) % SERVICIOS.length)}
+                aria-label="Ver servicio anterior"
+                className="group/arrow flex h-12 w-12 touch-manipulation items-center justify-center border border-zinc-700 text-white transition-colors hover:border-[#E1F030] hover:text-[#E1F030] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E1F030]"
+              >
+                <svg className="h-5 w-5 transition-transform group-hover/arrow:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+              </button>
+              <button
+                type="button"
+                onClick={() => irAServicio((servicioActivo + 1) % SERVICIOS.length)}
+                aria-label="Ver servicio siguiente"
+                className="group/arrow flex h-12 w-12 touch-manipulation items-center justify-center border border-zinc-700 text-white transition-colors hover:border-[#E1F030] hover:text-[#E1F030] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E1F030]"
+              >
+                <svg className="h-5 w-5 transition-transform group-hover/arrow:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+              </button>
+            </div>
           </div>
 
-          <motion.div style={{ x }} className="flex gap-6 md:gap-12 pl-[7.5vw] md:pl-[30vw] items-center relative z-10 w-fit">
-            {[
-              { num: "01", titulo: "Desarrollo Web", desc: "Sistemas a medida, landing pages de alta conversión y plataformas robustas creadas con las últimas tecnologías.", link: "#detalle-desarrollo" },
-              { num: "02", titulo: "Servicio Técnico Integral", desc: "Diagnóstico, reparación y mantenimiento de PC, más upgrades de SSD y RAM para recuperar rendimiento sin cambiar de equipo.", link: "#detalle-servicio-tecnico" },
-              { num: "03", titulo: "Starlink y Redes", desc: "Instalación de antena Starlink, configuración de router y WiFi, redes cableadas y repetidores para una conexión estable.", link: "#detalle-starlink" },
-              { num: "04", titulo: "Seguridad CCTV", desc: "Sistemas de videovigilancia. Cámaras HD, DVRs y configuración en Chaco para acceso remoto desde dispositivos móviles.", link: "#detalle-cctv" }
-            ].map((servicio, i) => (
-              <motion.article 
-                key={i}
-                initial={{ opacity: 0.1, scale: 0.85 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ margin: "0px -15% 0px -15%", amount: "some" }} 
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                // AGREGADO: min-h-[400px] md:min-h-[480px] para evitar que colapse en laptops
-                className="w-[88vw] md:w-[40vw] h-[55vh] md:h-[60vh] min-h-[340px] md:min-h-[480px] shrink-0 bg-[#0A0A0A] flex flex-col relative group overflow-hidden shadow-2xl border-none"
+          <div
+            ref={serviciosTrackRef}
+            onScroll={alDesplazarServicios}
+            role="region"
+            aria-roledescription="carrusel"
+            aria-label="Catálogo de servicios"
+            tabIndex={0}
+            className="relative -mx-4 flex touch-manipulation gap-5 overflow-x-auto overscroll-x-contain snap-x snap-mandatory scroll-pl-4 px-4 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:-mx-6 sm:scroll-pl-6 sm:px-6 md:gap-6 lg:-mx-8 lg:scroll-pl-8 lg:px-8 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E1F030]"
+          >
+            {SERVICIOS.map((servicio, i) => (
+              <motion.article
+                key={servicio.num}
+                ref={(el) => { serviciosCardsRef.current[i] = el; }}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: i * 0.05 }}
+                role="group"
+                aria-roledescription="slide"
+                aria-label={`${i + 1} de ${SERVICIOS.length}`}
+                className="group relative flex min-h-[360px] w-[86%] shrink-0 snap-start flex-col overflow-hidden border border-zinc-800 bg-[#0A0A0A] transition-colors duration-300 sm:w-[62%] md:min-h-[440px] md:w-[46%] lg:w-[37%] xl:w-[31%]"
               >
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#18181b_1px,transparent_1px),linear-gradient(to_bottom,#18181b_1px,transparent_1px)] bg-[size:2rem_2rem] opacity-20 pointer-events-none"></div>
-                
-                {/* AJUSTE: Reducimos un poco el padding (p-10) y los márgenes inferiores (mb-8) */}
-                <div className="w-full h-full p-8 md:p-10 flex flex-col justify-center relative z-10 bg-[#0A0A0A]">
-                  <span className="text-6xl md:text-7xl font-black text-zinc-900 mb-4 font-mono leading-none">
+                <span aria-hidden="true" className="block h-1 w-full shrink-0" style={{ backgroundColor: servicio.acento }} />
+                <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#18181b_1px,transparent_1px),linear-gradient(to_bottom,#18181b_1px,transparent_1px)] bg-[size:2rem_2rem] opacity-20" />
+                <div
+                  aria-hidden="true"
+                  className={`pointer-events-none absolute inset-0 transition-opacity duration-500 ${servicioActivo === i ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+                  style={{ background: `radial-gradient(120% 90% at 50% 0%, ${servicio.acento}26, transparent 70%)` }}
+                />
+                <div
+                  aria-hidden="true"
+                  className={`pointer-events-none absolute inset-0 border-2 transition-opacity duration-500 ${servicioActivo === i ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+                  style={{ borderColor: servicio.acento }}
+                />
+
+                <div className="relative z-10 flex h-full w-full flex-col p-7 md:p-10">
+                  <span className="mb-4 font-mono text-6xl font-black leading-none md:text-7xl" style={{ color: servicio.acento }}>
                     {servicio.num}
                   </span>
-                  <h3 className="text-3xl md:text-4xl font-bold text-white mb-4 uppercase tracking-widest">
+                  <h3 className="mb-3 text-2xl font-bold uppercase tracking-widest text-white md:mb-4 md:text-4xl">
                     {servicio.titulo}
                   </h3>
-                  <p className="text-base md:text-lg font-mono text-zinc-400 leading-relaxed mb-8">
+                  <p className="mb-6 font-mono text-sm leading-relaxed text-zinc-400 md:mb-8 md:text-lg">
                     {servicio.desc}
                   </p>
-                  <a href={servicio.link} aria-label={`Ver detalles sobre ${servicio.titulo}`} className="text-sm font-mono text-white uppercase tracking-widest underline decoration-zinc-600 underline-offset-8 hover:decoration-white transition-colors w-fit mt-auto pointer-events-auto">
+                  <a
+                    href={servicio.link}
+                    aria-label={`Ver detalles sobre ${servicio.titulo}`}
+                    className="mt-auto w-fit font-mono text-xs uppercase tracking-widest underline underline-offset-8 transition-colors md:text-sm"
+                    style={{ color: servicio.acento, textDecorationColor: servicio.acento }}
+                  >
                     Ver detalles →
                   </a>
                 </div>
               </motion.article>
             ))}
-            <div className="w-[7.5vw] md:w-[30vw] shrink-0 pointer-events-none"></div>
-          </motion.div>
+          </div>
+
+          <div className="mt-8 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-1">
+              {SERVICIOS.map((servicio, i) => (
+                <button
+                  key={servicio.num}
+                  type="button"
+                  onClick={() => irAServicio(i)}
+                  aria-label={`Ir al servicio ${i + 1}: ${servicio.titulo}`}
+                  aria-current={servicioActivo === i ? "true" : undefined}
+                  className="flex h-6 w-6 touch-manipulation items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                >
+                  <span
+                    className="block h-2 rounded-full transition-all duration-300"
+                    style={{
+                      width: servicioActivo === i ? 24 : 8,
+                      backgroundColor: servicioActivo === i ? servicio.acento : "#52525b",
+                    }}
+                  />
+                </button>
+              ))}
+            </div>
+            <span className="font-mono text-xs uppercase tracking-widest text-zinc-500">
+              {String(servicioActivo + 1).padStart(2, "0")} / {String(SERVICIOS.length).padStart(2, "0")}
+            </span>
+          </div>
+
+          <p className="sr-only" role="status" aria-live="polite">{estadoAnuncio}</p>
         </div>
       </section>
 
@@ -362,7 +530,7 @@ export default function Home() {
                 transition={{ duration: 0.6 }}
               >
                 <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                  <span className="w-2 h-2 bg-white"></span>
+                  <span className="w-2 h-2 bg-[#22D3EE]"></span>
                   <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Leandro David</span>
                 </div>
                 <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-none">
@@ -412,17 +580,18 @@ export default function Home() {
       </section>
 
       {/* 4: DETALLE DESARROLLO */}
-      <section id="detalle-desarrollo" ref={desarrolloRef} className="relative bg-[#050505] py-8 sm:py-16 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
+      <section id="detalle-desarrollo" ref={desarrolloRef} style={{ "--acento": "#E1F030", borderTopColor: "#E1F03066" } as CSSProperties} className="relative bg-[#050505] py-8 sm:py-16 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0" style={{ background: "radial-gradient(60% 50% at 85% 10%, #E1F03014, transparent 70%)" }} />
         <div aria-hidden="true" className="lg:hidden absolute inset-x-0 top-4 sm:top-20 z-0 flex justify-center pointer-events-none select-none overflow-hidden">
-          <span className="text-[24vw] font-black uppercase tracking-tighter text-zinc-900/40 whitespace-nowrap leading-none">Desarrollo</span>
+          <span className="text-[24vw] font-black uppercase tracking-tighter text-[var(--acento)] opacity-10 whitespace-nowrap leading-none">Desarrollo</span>
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-8 lg:gap-24 items-center">
             
             <div className="flex flex-col justify-center order-2 lg:order-1 relative z-10 -mt-8 sm:-mt-14 lg:mt-0 bg-[#0A0A0A]/95 lg:bg-transparent backdrop-blur-sm border border-zinc-900 lg:border-0 p-4 sm:p-8 md:p-10 lg:p-0 shadow-2xl lg:shadow-none">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
                 <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                  <span className="w-2 h-2 bg-white"></span>
+                  <span className="w-2 h-2 bg-[var(--acento)]"></span>
                   <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Servicio 01</span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-[1.1] mb-4 sm:mb-8">
@@ -447,7 +616,7 @@ export default function Home() {
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-6 sm:mt-12 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
                 
                 {/* Botón Principal */}
-                <a href="#contacto" aria-label="Iniciar proyecto de Desarrollo Web" className="w-full sm:w-auto justify-center inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-5 py-3 sm:px-8 sm:py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-white transition-colors">
+                <a href="#contacto" aria-label="Iniciar proyecto de Desarrollo Web" className="w-full sm:w-auto justify-center inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-5 py-3 sm:px-8 sm:py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-[var(--acento)] transition-colors">
                   Iniciar Desarrollo
                 </a>
 
@@ -460,9 +629,9 @@ export default function Home() {
             </div>
 
             <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full max-w-[28rem] mx-auto aspect-[16/7] sm:aspect-[3/2] lg:aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group translate-x-0 translate-y-0 lg:translate-x-0 lg:translate-y-0">
-              <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
+              <div className="absolute inset-0 bg-black/25 z-10 group-hover:bg-black/0 transition-colors duration-700 pointer-events-none"></div>
               <motion.div style={{ y: devImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
-                <Image src="/desarrollo-nuevo.webp" alt="Programación y Diseño de Sistemas Web a Medida" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
+                <Image src="/desarrollo-nuevo.webp" alt="Programación y Diseño de Sistemas Web a Medida" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
               </motion.div>
             </motion.div>
 
@@ -471,26 +640,27 @@ export default function Home() {
       </section>
 
       {/* 5: DETALLE SERVICIO TÉCNICO INTEGRAL */}
-      <section id="detalle-servicio-tecnico" ref={servicioTecnicoRef} className="relative bg-[#050505] py-8 sm:py-16 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
+      <section id="detalle-servicio-tecnico" ref={servicioTecnicoRef} style={{ "--acento": "#E1F030", borderTopColor: "#E1F03066" } as CSSProperties} className="relative bg-[#050505] py-8 sm:py-16 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
         <span id="detalle-mantenimiento" aria-hidden="true" className="absolute -top-24" />
         <span id="detalle-optimizacion" aria-hidden="true" className="absolute -top-24" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0" style={{ background: "radial-gradient(60% 50% at 85% 10%, #E1F03014, transparent 70%)" }} />
         <div aria-hidden="true" className="lg:hidden absolute inset-x-0 top-4 sm:top-20 z-0 flex justify-center pointer-events-none select-none overflow-hidden">
-          <span className="text-[24vw] font-black uppercase tracking-tighter text-zinc-900/40 whitespace-nowrap leading-none">Técnico</span>
+          <span className="text-[24vw] font-black uppercase tracking-tighter text-[var(--acento)] opacity-10 whitespace-nowrap leading-none">Técnico</span>
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-8 lg:gap-24 items-center">
             
             <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full max-w-[28rem] mx-auto aspect-[16/7] sm:aspect-[3/2] lg:aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group translate-x-0 translate-y-0 lg:translate-x-0 lg:translate-y-0">
-              <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
+              <div className="absolute inset-0 bg-black/25 z-10 group-hover:bg-black/0 transition-colors duration-700 pointer-events-none"></div>
               <motion.div style={{ y: tecnicoImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
-                <Image src="/img-reparacion.webp" alt="Servicio Técnico Integral, reparación, mantenimiento y optimización de PC en Chaco" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
+                <Image src="/img-reparacion.webp" alt="Servicio Técnico Integral, reparación, mantenimiento y optimización de PC en Chaco" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
               </motion.div>
             </motion.div>
 
             <div className="flex flex-col justify-center order-2 relative z-10 -mt-8 sm:-mt-14 lg:mt-0 bg-[#0A0A0A]/95 lg:bg-transparent backdrop-blur-sm border border-zinc-900 lg:border-0 p-4 sm:p-8 md:p-10 lg:p-0 shadow-2xl lg:shadow-none">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
                 <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                  <span className="w-2 h-2 bg-white"></span>
+                  <span className="w-2 h-2 bg-[var(--acento)]"></span>
                   <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Servicio 02</span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-[1.1] mb-4 sm:mb-8">
@@ -523,7 +693,7 @@ export default function Home() {
               </motion.div>
 
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-6 sm:mt-12">
-                <a href="#contacto" aria-label="Solicitar Diagnóstico de PC" className="inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-5 py-3 sm:px-8 sm:py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-white transition-colors">
+                <a href="#contacto" aria-label="Solicitar Diagnóstico de PC" className="inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-5 py-3 sm:px-8 sm:py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-[var(--acento)] transition-colors">
                   Solicitar Diagnóstico
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </a>
@@ -535,17 +705,18 @@ export default function Home() {
       </section>
 
       {/* 6: DETALLE STARLINK Y REDES */}
-      <section id="detalle-starlink" ref={starlinkRef} className="relative bg-[#050505] py-8 sm:py-16 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
+      <section id="detalle-starlink" ref={starlinkRef} style={{ "--acento": "#E1F030", borderTopColor: "#E1F03066" } as CSSProperties} className="relative bg-[#050505] py-8 sm:py-16 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0" style={{ background: "radial-gradient(60% 50% at 85% 10%, #E1F03014, transparent 70%)" }} />
         <div aria-hidden="true" className="lg:hidden absolute inset-x-0 top-4 sm:top-20 z-0 flex justify-center pointer-events-none select-none overflow-hidden">
-          <span className="text-[24vw] font-black uppercase tracking-tighter text-zinc-900/40 whitespace-nowrap leading-none">Redes</span>
+          <span className="text-[24vw] font-black uppercase tracking-tighter text-[var(--acento)] opacity-10 whitespace-nowrap leading-none">Redes</span>
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-8 lg:gap-24 items-center">
             
             <div className="flex flex-col justify-center order-2 lg:order-1 relative z-10 -mt-8 sm:-mt-14 lg:mt-0 bg-[#0A0A0A]/95 lg:bg-transparent backdrop-blur-sm border border-zinc-900 lg:border-0 p-4 sm:p-8 md:p-10 lg:p-0 shadow-2xl lg:shadow-none">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
                 <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                  <span className="w-2 h-2 bg-white"></span>
+                  <span className="w-2 h-2 bg-[var(--acento)]"></span>
                   <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Servicio 03</span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-[1.1] mb-4 sm:mb-8">
@@ -569,7 +740,7 @@ export default function Home() {
               </motion.div>
 
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-6 sm:mt-12">
-                <a href="#contacto" aria-label="Cotizar instalación de Starlink y redes" className="inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-5 py-3 sm:px-8 sm:py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-white transition-colors">
+                <a href="#contacto" aria-label="Cotizar instalación de Starlink y redes" className="inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-5 py-3 sm:px-8 sm:py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-[var(--acento)] transition-colors">
                   Cotizar Instalación
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </a>
@@ -577,9 +748,9 @@ export default function Home() {
             </div>
 
             <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full max-w-[28rem] mx-auto aspect-[16/7] sm:aspect-[3/2] lg:aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 lg:order-2 group translate-x-0 translate-y-0 lg:translate-x-0 lg:translate-y-0">
-              <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
+              <div className="absolute inset-0 bg-black/25 z-10 group-hover:bg-black/0 transition-colors duration-700 pointer-events-none"></div>
               <motion.div style={{ y: starlinkImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
-                <Image src="/img-starlink.webp" alt="Instalación de antena Starlink y configuración de redes WiFi" fill loading="eager" sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
+                <Image src="/img-starlink.webp" alt="Instalación de antena Starlink y configuración de redes WiFi" fill loading="eager" sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
               </motion.div>
             </motion.div>
 
@@ -588,24 +759,25 @@ export default function Home() {
       </section>
 
       {/* 7: DETALLE CCTV */}
-      <section id="detalle-cctv" ref={cctvRef} className="relative bg-[#050505] py-8 sm:py-16 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
+      <section id="detalle-cctv" ref={cctvRef} style={{ "--acento": "#E1F030", borderTopColor: "#E1F03066" } as CSSProperties} className="relative bg-[#050505] py-8 sm:py-16 lg:py-32 border-t border-zinc-900 z-30 overflow-hidden">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0" style={{ background: "radial-gradient(60% 50% at 85% 10%, #E1F03014, transparent 70%)" }} />
         <div aria-hidden="true" className="lg:hidden absolute inset-x-0 top-4 sm:top-20 z-0 flex justify-center pointer-events-none select-none overflow-hidden">
-          <span className="text-[24vw] font-black uppercase tracking-tighter text-zinc-900/40 whitespace-nowrap leading-none">Seguridad</span>
+          <span className="text-[24vw] font-black uppercase tracking-tighter text-[var(--acento)] opacity-10 whitespace-nowrap leading-none">Seguridad</span>
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-8 lg:gap-24 items-center">
             
             <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }} className="relative w-full max-w-[28rem] mx-auto aspect-[16/7] sm:aspect-[3/2] lg:aspect-[3/4] overflow-hidden border border-zinc-800 bg-black order-1 group translate-x-0 translate-y-0 lg:translate-x-0 lg:translate-y-0">
-              <div className="absolute inset-0 bg-black/40 z-10 mix-blend-overlay group-hover:bg-black/10 transition-colors duration-700 pointer-events-none"></div>
+              <div className="absolute inset-0 bg-black/25 z-10 group-hover:bg-black/0 transition-colors duration-700 pointer-events-none"></div>
               <motion.div style={{ y: cctvImageY }} className="absolute -top-[20%] -bottom-[20%] left-0 right-0 w-full h-[140%]">
-                <Image src="/img-camaras.webp" alt="Instalación de Cámaras de Seguridad CCTV y Videovigilancia" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" />
+                <Image src="/img-camaras.webp" alt="Instalación de Cámaras de Seguridad CCTV y Videovigilancia" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
               </motion.div>
             </motion.div>
 
             <div className="flex flex-col justify-center order-2 relative z-10 -mt-8 sm:-mt-14 lg:mt-0 bg-[#0A0A0A]/95 lg:bg-transparent backdrop-blur-sm border border-zinc-900 lg:border-0 p-4 sm:p-8 md:p-10 lg:p-0 shadow-2xl lg:shadow-none">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
                 <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                  <span className="w-2 h-2 bg-white"></span>
+                  <span className="w-2 h-2 bg-[var(--acento)]"></span>
                   <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Servicio 04</span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase tracking-tighter text-white leading-[1.1] mb-4 sm:mb-8">
@@ -627,7 +799,7 @@ export default function Home() {
               </motion.div>
 
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-6 sm:mt-12">
-                <a href="#contacto" aria-label="Presupuestar proyecto CCTV" className="inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-5 py-3 sm:px-8 sm:py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-white transition-colors">
+                <a href="#contacto" aria-label="Presupuestar proyecto CCTV" className="inline-flex items-center gap-4 border border-zinc-800 bg-[#0A0A0A] px-5 py-3 sm:px-8 sm:py-4 text-xs font-mono text-white uppercase tracking-widest hover:border-[var(--acento)] transition-colors">
                   Presupuestar Proyecto
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </a>
@@ -701,7 +873,7 @@ export default function Home() {
           
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }} className="mb-16 md:mb-24">
             <div className="flex items-center gap-3 mb-6">
-              <span className="w-2 h-2 bg-white"></span>
+              <span className="w-2 h-2 bg-[#E1F030]"></span>
               <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Comunidad</span>
             </div>
             <h2 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-tighter text-white leading-none">
@@ -714,12 +886,12 @@ export default function Home() {
             <motion.a href="https://www.instagram.com/compufix.sp" aria-label="Visitar el Instagram de Compufix" target="_blank" rel="noopener noreferrer" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.5 }} className="group flex items-center justify-between py-10 md:py-16 border-b border-zinc-900 hover:border-zinc-700 transition-colors">
               <div className="flex items-center gap-6 md:gap-12">
                 <span className="text-xl md:text-2xl font-mono font-black text-zinc-800 group-hover:text-zinc-500 transition-colors">IG</span>
-                <span className="text-3xl md:text-6xl lg:text-7xl font-black uppercase tracking-tighter text-zinc-500 group-hover:text-white transition-colors duration-500">Instagram</span>
+                <span className="text-3xl md:text-6xl lg:text-7xl font-black uppercase tracking-tighter text-zinc-500 group-hover:text-[#E1306C] transition-colors duration-500">Instagram</span>
               </div>
               <div className="flex items-center gap-6">
                 <span className="hidden md:block text-xs font-mono text-zinc-600 uppercase tracking-widest group-hover:text-zinc-400 transition-colors">@compufix.sp</span>
-                <div className="w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center group-hover:bg-white group-hover:border-white transition-all duration-500">
-                  <svg className="w-5 h-5 text-zinc-500 group-hover:text-black transform group-hover:rotate-[-45deg] transition-all duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                <div className="w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center group-hover:bg-[#E1306C] group-hover:border-[#E1306C] transition-all duration-500">
+                  <svg className="w-5 h-5 text-zinc-500 group-hover:text-white transform group-hover:rotate-[-45deg] transition-all duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </div>
               </div>
             </motion.a>
@@ -762,7 +934,7 @@ export default function Home() {
             <div className="lg:col-span-4 lg:sticky lg:top-40">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
                 <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                  <span className="w-2 h-2 bg-white"></span>
+                  <span className="w-2 h-2 bg-[#3B82F6]"></span>
                   <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Dudas Comunes</span>
                 </div>
                 <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter text-white leading-none mb-6">
@@ -797,7 +969,7 @@ export default function Home() {
             <div className="flex flex-col justify-center">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
                 <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                  <span className="w-2 h-2 bg-white"></span>
+                  <span className="w-2 h-2 bg-[#F59E0B]"></span>
                   <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Iniciá tu consulta</span>
                 </div>
                 <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter text-white leading-none mb-8">
@@ -829,17 +1001,17 @@ export default function Home() {
                 
                 <div className="relative group">
                   <label htmlFor="nombre" className="sr-only">Tu Nombre</label>
-                  <input id="nombre" type="text" name="nombre" required placeholder="Tu nombre" className="w-full bg-transparent border-b border-zinc-800 py-4 text-white font-mono text-sm placeholder-zinc-600 focus:outline-none focus:border-white transition-colors" />
+                  <input id="nombre" type="text" name="nombre" required placeholder="Tu nombre" className="w-full bg-transparent border-b border-zinc-800 py-4 text-white font-mono text-sm placeholder-zinc-600 focus:outline-none focus:border-[#E1F030] transition-colors" />
                 </div>
 
                 <div className="relative group">
                   <label htmlFor="email" className="sr-only">Tu Email</label>
-                  <input id="email" type="email" name="email" required placeholder="Email" className="w-full bg-transparent border-b border-zinc-800 py-4 text-white font-mono text-sm placeholder-zinc-600 focus:outline-none focus:border-white transition-colors" />
+                  <input id="email" type="email" name="email" required placeholder="Email" className="w-full bg-transparent border-b border-zinc-800 py-4 text-white font-mono text-sm placeholder-zinc-600 focus:outline-none focus:border-[#E1F030] transition-colors" />
                 </div>
 
                 <div className="relative group">
                   <label htmlFor="servicio" className="sr-only">Seleccionar Servicio</label>
-                  <select id="servicio" name="servicio" required defaultValue="" className="w-full bg-[#0A0A0A] border-b border-zinc-800 py-4 text-zinc-400 font-mono text-sm focus:outline-none focus:border-white transition-colors appearance-none cursor-pointer">
+                  <select id="servicio" name="servicio" required defaultValue="" className="w-full bg-[#0A0A0A] border-b border-zinc-800 py-4 text-zinc-400 font-mono text-sm focus:outline-none focus:border-[#E1F030] transition-colors appearance-none cursor-pointer">
                     <option value="" disabled hidden>Seleccioná un servicio...</option>
                     <option value="desarrollo" className="bg-[#0A0A0A] text-white">Desarrollo Web / Páginas</option>
                     <option value="servicio-tecnico" className="bg-[#0A0A0A] text-white">Servicio Técnico Integral (reparación + optimización)</option>
@@ -854,14 +1026,14 @@ export default function Home() {
 
                 <div className="relative group">
                   <label htmlFor="mensaje" className="sr-only">Mensaje</label>
-                  <textarea id="mensaje" name="mensaje" required rows={4} placeholder="Contame los detalles de tu problema o proyecto..." className="w-full bg-transparent border-b border-zinc-800 py-4 text-white font-mono text-sm placeholder-zinc-600 focus:outline-none focus:border-white transition-colors resize-none"></textarea>
+                  <textarea id="mensaje" name="mensaje" required rows={4} placeholder="Contame los detalles de tu problema o proyecto..." className="w-full bg-transparent border-b border-zinc-800 py-4 text-white font-mono text-sm placeholder-zinc-600 focus:outline-none focus:border-[#E1F030] transition-colors resize-none"></textarea>
                 </div>
 
                 <button 
                   type="submit" 
                   disabled={estado === 'enviando' || estado === 'exito'}
                   className={`mt-4 w-full border px-8 py-5 text-sm font-mono uppercase tracking-widest transition-all duration-300 flex justify-center items-center gap-4
-                    ${estado === 'ideal' ? 'border-zinc-800 text-white hover:bg-white hover:text-black' : ''}
+                    ${estado === 'ideal' ? 'border-zinc-800 text-white hover:bg-[#E1F030] hover:text-black hover:border-[#E1F030]' : ''}
                     ${estado === 'enviando' ? 'border-zinc-600 text-zinc-400 cursor-wait bg-zinc-900' : ''}
                     ${estado === 'exito' ? 'border-green-900 text-green-400 bg-green-950/30' : ''}
                     ${estado === 'error' ? 'border-red-900 text-red-400 bg-red-950/30 hover:bg-red-900 hover:text-white' : ''}
